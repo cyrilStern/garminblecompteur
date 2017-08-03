@@ -12,11 +12,33 @@
     tools:layout_editor_absoluteY="8dp"
     tools:layout_editor_absoluteX="8dp"
     tools:ignore="MissingConstraints">
-    <ListView
-        android:id="@+id/listele"
-        android:layout_width="138dp"
-        android:layout_height="495dp"
-        tools:layout_editor_absoluteX="123dp"
-        tools:layout_editor_absoluteY="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="161dp"
+            android:layout_height="161dp"
+            android:ems="10"
+            android:inputType="number" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="TextView" />
+
+        <ListView
+            android:id="@+id/listele"
+            android:layout_width="161dp"
+            android:layout_height="match_parent"
+            tools:layout_editor_absoluteX="123dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+    </LinearLayout>
+
 </FrameLayout>
 </android.support.constraint.ConstraintLayout>
