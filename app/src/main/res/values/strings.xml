@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">garminblecompteur</string>
+    <string name="ble_not_supported">bluetooth low energy not supported</string>
+</resources>
