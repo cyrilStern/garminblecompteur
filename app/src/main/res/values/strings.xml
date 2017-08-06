@@ -3,4 +3,6 @@
     <string name="ble_not_supported">bluetooth low energy not supported</string>
     <string name="unknown_service">service inconu</string>
     <string name="unknown_characteristic">caraterisque inconnu</string>
+    <string name="connected">connecter</string>
+    <string name="disconnected">deconnecter</string>
 </resources>

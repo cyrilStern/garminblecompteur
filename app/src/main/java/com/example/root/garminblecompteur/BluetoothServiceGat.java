@@ -58,7 +58,7 @@ public class BluetoothServiceGat extends Service {
         super.onStartCommand(intent, flags, startId);
         // Various callback methods defined by the BLE API.
 
-        return START_NOT_STICKY;
+        return START_STICKY;
 
     }
     private final BluetoothGattCallback mGattCallback =
