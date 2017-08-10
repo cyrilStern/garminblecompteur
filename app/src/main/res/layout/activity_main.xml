@@ -23,7 +23,9 @@
             android:layout_width="161dp"
             android:layout_height="161dp"
             android:ems="10"
-            android:inputType="number" />
+            android:inputType="number"
+            android:textSize="36sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textView"
