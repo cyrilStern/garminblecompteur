@@ -1,5 +1,6 @@
 package com.example.root.garminblecompteur;
 
+import android.app.Application;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -29,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import static com.mapbox.mapboxsdk.Mapbox.getApplicationContext;
+
 /**
  * Created by root on 03/08/17.
  */
@@ -38,7 +41,7 @@ class LeDeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
 
 
 
-    public LeDeviceListAdapter(MainActivity context, List<BluetoothDevice> lvDevice) {
+    public LeDeviceListAdapter(lisdevices context, List<BluetoothDevice> lvDevice) {
         super(context, 0, lvDevice);
     }
 
@@ -137,7 +140,8 @@ class LeDeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
         //il ne reste plus qu'à remplir notre vue
         viewHolder.pseudo.setText(bluedevice.getName());
         viewHolder.text.setText(String.valueOf(bluedevice.getBondState()));
-        viewHolder.avatar.setColorFilter(R.color.colorAccent);
+        final int id = getApplicationContext().getResources().getIdentifier("drawable/"+ bluedevice.getUuids(), null, getApplicationContext().getPackageName());
+        viewHolder.avatar.setImageResource(id);
 
         return convertView;
     }
