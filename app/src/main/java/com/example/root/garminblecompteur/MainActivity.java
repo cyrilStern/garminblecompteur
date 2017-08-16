@@ -258,33 +258,34 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             //super.onCharacteristicChanged(gatt, characteristic);
-            int offset = 0;
-            offset += 1;
-            Log.i("onCharacteristicChange", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))));
 
-            int wheelRevolutions = 0;
-            int lastWheelEventTime = 0;
-            if (true) {
-                wheelRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, offset);
-                offset += 4;
-
-                lastWheelEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset); // 1/1024 s
-                offset += 2;
-            }
-            int crankRevolutions = 0;
-            int lastCrankEventTime = 0;
-            if (true) {
-                crankRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
-                offset += 2;
-
-                lastCrankEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
-                offset += 2;
-
-            }
 
 
             if (String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))).equals("CSC Measurement")) {
                 //final int cyclingcadence = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
+                int offset = 0;
+                offset += 1;
+                Log.i("onCharacteristicChange", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))));
+
+                int wheelRevolutions = 0;
+                int lastWheelEventTime = 0;
+                if (true) {
+                    wheelRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, offset);
+                    offset += 4;
+
+                    lastWheelEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset); // 1/1024 s
+                    offset += 2;
+                }
+                int crankRevolutions = 0;
+                int lastCrankEventTime = 0;
+                if (true) {
+                    crankRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
+                    offset += 2;
+
+                    lastCrankEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
+                    offset += 2;
+
+                }
                 final int finalWheelRevolutions = wheelRevolutions;
                 final int finalCrankRevolutions = crankRevolutions;
                 final int finalLastCrankEventTime = lastCrankEventTime;
