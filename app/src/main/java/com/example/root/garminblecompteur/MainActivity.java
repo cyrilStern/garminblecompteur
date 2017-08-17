@@ -73,9 +73,6 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private boolean mScanning;
     private Handler mHandler;
-    private static final long SCAN_PERIOD = 10000;
-    private LeDeviceListAdapter mLeDeviceListAdapter;
-    private ListView lv;
     private TextView textViewCardio,textViewSpeed;
     private TextView textViewCadence;
     private List<BluetoothDevice> lvDevice;
@@ -87,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
     BluetoothGattCharacteristic characteristic;
     private CameraPosition cameraPosition;
     public Marker marker;
-    boolean enabled;
     private Icon icon;
     private Marker maker;
     private MarkerViewOptions markerViewOptions;
@@ -143,8 +139,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBluetoothGatt.disconnect();
-        mBluetoothGatt.close();
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)

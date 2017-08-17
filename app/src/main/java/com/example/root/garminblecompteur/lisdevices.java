@@ -36,27 +36,15 @@ public class lisdevices extends AppCompatActivity{
 
     private static final int REQUEST_ENABLE_BT = 11;
     private BluetoothAdapter mBluetoothAdapter;
-    private LocationManager locationManager;
     private boolean mScanning;
     private Handler mHandler;
-    private static final long SCAN_PERIOD = 10000;
+    private static final long SCAN_PERIOD = 7000;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private ListView lv;
-    private TextView textViewCardio,textViewSpeed;
-    private TextView textViewCadence;
     private List<BluetoothDevice> lvDevice;
     private int mConnectionState = STATE_DISCONNECTED;
     private final String TAG = LeDeviceListAdapter.class.getName();
-    private BluetoothGatt mBluetoothGatt;
-    private MapView mapView = null;
-    private MapboxMap mapboxmap;
     BluetoothGattCharacteristic characteristic;
-    private CameraPosition cameraPosition;
-    public Marker marker;
-    boolean enabled;
-    private Icon icon;
-    private Marker maker;
-    private MarkerViewOptions markerViewOptions;
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
@@ -83,6 +71,7 @@ public class lisdevices extends AppCompatActivity{
                 Intent i = new Intent();
                 i.putExtra("DEVICE", (Parcelable) bluetoothDevice);
                 setResult(RESULT_OK, i);
+                mBluetoothAdapter.cancelDiscovery();
                 finish();
 
             }
