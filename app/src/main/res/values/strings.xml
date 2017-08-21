@@ -5,4 +5,6 @@
     <string name="unknown_characteristic">caraterisque inconnu</string>
     <string name="connected">connecter</string>
     <string name="disconnected">deconnecter</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
 </resources>

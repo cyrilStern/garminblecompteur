@@ -25,6 +25,8 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +34,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -92,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int STATE_CONNECTED = 2;
     private CalculationBikeCommon calculationBikeCommon;
     private static String REQUESTDEVICEBLE = "deviceWanted";
+    private ActionBarDrawerToggle mDrawerToggle;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -105,6 +110,30 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Mapbox.getInstance(getApplicationContext(), "pk.eyJ1IjoiaG9ybmV0bm9pciIsImEiOiJjajY5dDlzeWkwdHMzMzJscWhsZ3l4dDI5In0.wDgG5dXpVVEUNlkAyISDaQ");
         setContentView(R.layout.activity_main);
+
+        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //sidemenu open close
+        FrameLayout fr = (FrameLayout) findViewById(R.id.content_frame);
+        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,
+                R.string.drawer_open, R.string.drawer_close) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+            //    getActionBar().setTitle("");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+//                getActionBar().setTitle("menu");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        // Set the drawer toggle as the DrawerListener
+
         getSupportActionBar().hide();
         textViewCardio = (TextView) findViewById(R.id.textView);
         textViewCadence = (TextView) findViewById(R.id.textView2);
