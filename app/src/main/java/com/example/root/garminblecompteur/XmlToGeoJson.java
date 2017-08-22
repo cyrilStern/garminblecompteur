@@ -1,17 +1,29 @@
 package com.example.root.garminblecompteur;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.services.commons.geojson.GeoJSON;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,36 +43,61 @@ public class XmlToGeoJson {
         return xmlToGeoJson;
     }
 
-    public GeoJSON decodeXmlToGeoJson(String path, Context ctx) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
+    public ArrayList<LatLng> decodeXmlToGeoJson(String path, Context ctx) throws ParserConfigurationException, IOException, SAXException, XmlPullParserException {
+//        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//        DocumentBuilder db = dbf.newDocumentBuilder();
+//        try {
+//            Document doc = db.parse(new InputSource(ctx.getResources().getAssets().open(path)));
+//            doc.getDocumentElement().normalize();
+//            NodeList nodeList = doc.getElementsByTagName("trkseg");
+//            Log.i("testReaer",String.valueOf(nodeList.item(0).getNodeName()));
+//        } catch (SAXException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+//Get the text file
+        BufferedReader reader = null;
+        StringBuilder sb = new StringBuilder();
         try {
-            Document doc = db.parse(new InputSource(ctx.getResources().getAssets().open(path)));
-            Log.i("testReaer",String.valueOf(doc.getElementsByTagName("gtr")[0]));
-        } catch (SAXException e) {
-            e.printStackTrace();
+            reader = new BufferedReader(
+                    new InputStreamReader(ctx.getAssets().open(path)));
+
+            // do reading, usually loop until end of file reading
+            String mLine;
+            while ((mLine = reader.readLine()) != null) {
+                sb.append(mLine);
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                }
+            }
         }
 
-        GeoJSON geoJSON  = new GeoJSON() {
-            @Override
-            public String getType() {
-                return null;
-            }
+        ArrayList<LatLng> lineStringArray = new ArrayList<LatLng>();
+        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        XmlPullParser xpp = factory.newPullParser();
+        xpp.setInput( new StringReader(sb.toString()) );
+        int eventType = xpp.getEventType();
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            if(eventType == XmlPullParser.START_DOCUMENT) {
+            } else if(eventType == XmlPullParser.START_TAG) {
+                if (xpp.getAttributeCount() != 0 && xpp.getName().toString().equals("trkpt") ) {
+                    lineStringArray.add(new LatLng(Float.parseFloat(xpp.getAttributeValue(0)),Float.parseFloat(xpp.getAttributeValue(1))));
+                }
 
-            @Override
-            public String toJson() {
-                return null;
+            } else if(eventType == XmlPullParser.END_TAG) {
+            } else if(eventType == XmlPullParser.TEXT) {
             }
-        };
-        InputStream inputStream = new InputStream() {
-            @Override
-            public int read() throws IOException {
-                return 0;
-            }
-        };
+            eventType = xpp.next();
+        }
 
-        return geoJSON;
+        return lineStringArray;
     }
 }

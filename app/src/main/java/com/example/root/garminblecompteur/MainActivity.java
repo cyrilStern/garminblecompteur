@@ -15,6 +15,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -47,6 +48,7 @@ import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -55,6 +57,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -101,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     private CalculationBikeCommon calculationBikeCommon;
     private static String REQUESTDEVICEBLE = "deviceWanted";
     private ActionBarDrawerToggle mDrawerToggle;
-
+    private  ArrayList<LatLng> trace;
     @Override
     protected void onStart() {
         super.onStart();
@@ -138,16 +141,6 @@ public class MainActivity extends AppCompatActivity {
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         // Set the drawer toggle as the DrawerListener
-        XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
-        try {
-            xmlToGeoJson.decodeXmlToGeoJson("gpx/roadtrip.gpx",getApplicationContext());
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        }
         getSupportActionBar().hide();
         textViewCardio = (TextView) findViewById(R.id.textView);
         textViewCadence = (TextView) findViewById(R.id.textView2);
@@ -168,9 +161,31 @@ public class MainActivity extends AppCompatActivity {
                 maker = mapboxMap.addMarker(new MarkerOptions()
                         .position(new LatLng(-33.85699436, 151.21510684)));
                 maker.setIcon(icon);
+                XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
+                try {
+                    trace = xmlToGeoJson.decodeXmlToGeoJson("gpx/roadtrip.gpx",getApplicationContext());
+                    PolylineOptions polylineOptions = new PolylineOptions()
+                            .addAll(trace)
+                            .color(Color.RED)
+                            .width(3f);
+                    mapboxmap.addPolyline(polylineOptions);
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                } catch (XmlPullParserException e) {
+                    e.printStackTrace();
+                }finally {
+
+                }
+
+
 
             }
         });
+
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
             finish();
@@ -269,6 +284,9 @@ public class MainActivity extends AppCompatActivity {
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 0, locationListener);
 
         }
+
+
+// add polyline to MapboxMap object
         long minTime = 5 * 1000; // Minimum time interval for update in seconds, i.e. 5 seconds.
         long minDistance = 10;
 
