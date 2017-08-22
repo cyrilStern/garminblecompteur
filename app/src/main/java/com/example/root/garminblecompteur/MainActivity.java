@@ -54,12 +54,17 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import static android.bluetooth.BluetoothAdapter.STATE_DISCONNECTED;
 import static android.bluetooth.BluetoothProfile.STATE_CONNECTED;
@@ -133,7 +138,16 @@ public class MainActivity extends AppCompatActivity {
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         // Set the drawer toggle as the DrawerListener
-
+        XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
+        try {
+            xmlToGeoJson.decodeXmlToGeoJson("gpx/roadtrip.gpx",getApplicationContext());
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
         getSupportActionBar().hide();
         textViewCardio = (TextView) findViewById(R.id.textView);
         textViewCadence = (TextView) findViewById(R.id.textView2);
