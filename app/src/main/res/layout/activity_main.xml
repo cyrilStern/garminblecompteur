@@ -14,13 +14,14 @@
     <!-- The navigation drawer -->
     <ListView
         android:id="@+id/left_drawer"
+        style="@style/Widget.AppCompat.ListView.Menu"
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#111"
+        android:background="@color/colorAccent"
         android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp" />
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="3dp" />
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"

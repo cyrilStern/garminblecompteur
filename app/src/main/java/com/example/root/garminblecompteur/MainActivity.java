@@ -20,6 +20,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -34,6 +35,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -59,6 +61,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -105,6 +108,10 @@ public class MainActivity extends AppCompatActivity {
     private static String REQUESTDEVICEBLE = "deviceWanted";
     private ActionBarDrawerToggle mDrawerToggle;
     private  ArrayList<LatLng> trace;
+    private int FIRSTLAUNCH = 0;
+    private File file;
+    private ListView listViewGpsFile;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -119,8 +126,50 @@ public class MainActivity extends AppCompatActivity {
         Mapbox.getInstance(getApplicationContext(), "pk.eyJ1IjoiaG9ybmV0bm9pciIsImEiOiJjajY5dDlzeWkwdHMzMzJscWhsZ3l4dDI5In0.wDgG5dXpVVEUNlkAyISDaQ");
         setContentView(R.layout.activity_main);
 
+/**
+ * creation de la liste des traces gps a charger
+ *
+ */
+        listViewGpsFile = (ListView) findViewById(R.id.left_drawer);
+        FileService fileService = FileService.getInstance();
+        final ArrayList<FileContainer> arraylistFileContainer = fileService.getListFile("gpstrace");
+        ArrayList<String> listNameGpsFile = new ArrayList<>();
+        for (FileContainer fileGps: arraylistFileContainer
+             ) {
+            listNameGpsFile.add(fileGps.getName());
+        }
+
+        listViewGpsFile.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, listNameGpsFile ));
+        listViewGpsFile.bringToFront();
+
+        listViewGpsFile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String pathFromItem = arraylistFileContainer.get(position).getPath();
+                XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
+                try {
+                    trace = xmlToGeoJson.decodeXmlToGeoJson(pathFromItem,getApplicationContext());
+                Log.i("trerte", String.valueOf(trace.size()));
+                    PolylineOptions polylineOptions = new PolylineOptions()
+                            .addAll(trace)
+                            .color(Color.RED)
+                            .width(3f);
+                    mapboxmap.addPolyline(polylineOptions);
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                } catch (XmlPullParserException e) {
+                    e.printStackTrace();
+                }finally {
+
+                }
+            }
+        });
         DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //sidemenu open close
         FrameLayout fr = (FrameLayout) findViewById(R.id.content_frame);
         mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
@@ -152,37 +201,14 @@ public class MainActivity extends AppCompatActivity {
         IconFactory iconFactory = IconFactory.getInstance(MainActivity.this);
         icon = iconFactory.fromResource(R.drawable.mapbox_mylocation_icon_default);
         calculationBikeCommon = new CalculationBikeCommon();
-// Add the marker to the map
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 mapboxmap = mapboxMap;
                 maker = mapboxMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(-33.85699436, 151.21510684)));
+                        .position(new LatLng(48.866667, 2.333333)));
                 maker.setIcon(icon);
-                XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
-                try {
-                    trace = xmlToGeoJson.decodeXmlToGeoJson("gpx/roadtrip.gpx",getApplicationContext());
-                    PolylineOptions polylineOptions = new PolylineOptions()
-                            .addAll(trace)
-                            .color(Color.RED)
-                            .width(3f);
-                    mapboxmap.addPolyline(polylineOptions);
-                } catch (ParserConfigurationException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (SAXException e) {
-                    e.printStackTrace();
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                }finally {
-
-                }
-
-
-
             }
         });
 
@@ -260,8 +286,10 @@ public class MainActivity extends AppCompatActivity {
                         .zoom(15) // Sets the zoom to level 10
                         .tilt(20) // Set the camera tilt to 20 degrees
                         .build();
-               // mapboxmap.setCameraPosition(cameraPosition);
-                mapboxmap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                if( FIRSTLAUNCH != 1){
+                    mapboxmap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    FIRSTLAUNCH = 1;
+                }
                 maker.setPosition(new LatLng(location.getLatitude(),location.getLongitude()));
 
             }
@@ -284,11 +312,6 @@ public class MainActivity extends AppCompatActivity {
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 0, locationListener);
 
         }
-
-
-// add polyline to MapboxMap object
-        long minTime = 5 * 1000; // Minimum time interval for update in seconds, i.e. 5 seconds.
-        long minDistance = 10;
 
     }
 
@@ -420,9 +443,5 @@ public class MainActivity extends AppCompatActivity {
       Intent intent = new Intent(this,lisdevices.class);
       startActivityForResult(intent,REQUEST_ENABLE_BT);
   }
-
-
-    //mpa part
-
 
 }

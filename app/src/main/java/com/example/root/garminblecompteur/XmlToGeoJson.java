@@ -62,7 +62,7 @@ public class XmlToGeoJson {
         StringBuilder sb = new StringBuilder();
         try {
             reader = new BufferedReader(
-                    new InputStreamReader(ctx.getAssets().open(path)));
+                    new FileReader(path));
 
             // do reading, usually loop until end of file reading
             String mLine;
@@ -88,7 +88,7 @@ public class XmlToGeoJson {
         while (eventType != XmlPullParser.END_DOCUMENT) {
             if(eventType == XmlPullParser.START_DOCUMENT) {
             } else if(eventType == XmlPullParser.START_TAG) {
-                if (xpp.getAttributeCount() != 0 && xpp.getName().toString().equals("trkpt") ) {
+                if (xpp.getAttributeCount() != 0 && xpp.getName().equals("trkpt") ) {
                     lineStringArray.add(new LatLng(Float.parseFloat(xpp.getAttributeValue(0)),Float.parseFloat(xpp.getAttributeValue(1))));
                 }
 
