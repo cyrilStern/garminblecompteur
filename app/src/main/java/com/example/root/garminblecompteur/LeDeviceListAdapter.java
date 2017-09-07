@@ -1,36 +1,22 @@
 package com.example.root.garminblecompteur;
 
-import android.app.Application;
-import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.res.Resources;
-import android.database.DataSetObserver;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-
-import static com.mapbox.mapboxsdk.Mapbox.getApplicationContext;
 
 /**
  * Created by root on 03/08/17.
@@ -41,7 +27,7 @@ class LeDeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
 
 
 
-    public LeDeviceListAdapter(lisdevices context, List<BluetoothDevice> lvDevice) {
+    public LeDeviceListAdapter(Listdevices context, List<BluetoothDevice> lvDevice) {
         super(context, 0, lvDevice);
     }
 
@@ -128,26 +114,23 @@ class LeDeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
         TweetViewHolder viewHolder = (TweetViewHolder) convertView.getTag();
         if(viewHolder == null){
             viewHolder = new TweetViewHolder();
-            viewHolder.pseudo = (TextView) convertView.findViewById(R.id.pseudo);
+            viewHolder.devicename = (TextView) convertView.findViewById(R.id.devicename);
             viewHolder.text = (TextView) convertView.findViewById(R.id.text);
-            viewHolder.avatar = (ImageView) convertView.findViewById(R.id.avatar);
             convertView.setTag(viewHolder);
         }
 
-        //getItem(position) va récupérer l'item [position] de la List<Tweet> tweets
+        //getItem(position) va récupérer l'item [position] de la List<bluethoof> ble
         BluetoothDevice bluedevice = getItem(position);
 
         //il ne reste plus qu'à remplir notre vue
-        viewHolder.pseudo.setText(bluedevice.getName());
-        viewHolder.text.setText(String.valueOf(bluedevice.getBondState()));
-        final int id = getApplicationContext().getResources().getIdentifier("drawable/"+ bluedevice.getUuids(), null, getApplicationContext().getPackageName());
-        viewHolder.avatar.setImageResource(id);
+        viewHolder.devicename.setText(bluedevice.getName());
+        viewHolder.text.setText(String.valueOf(bluedevice.getAddress()));
 
         return convertView;
     }
 
     private class TweetViewHolder{
-        public TextView pseudo;
+        public TextView devicename;
         public TextView text;
         public ImageView avatar;
     }

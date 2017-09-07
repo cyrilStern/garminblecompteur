@@ -22,13 +22,17 @@ public class CalculationBikeCommon {
     public CalculationBikeCommon() {
 
     }
+
     public int adddistanceTodistance(int adddistance){
         this.distance += distance;
         return distance;
     }
+
     public void resetcompteur(){
         this.distance = 0;
     }
+
+
     public float speedcalculation(int wheelRevolutions, int lastWheelEventTime){
         if (mFirstWheelRevolutions < 0)
             mFirstWheelRevolutions = wheelRevolutions;

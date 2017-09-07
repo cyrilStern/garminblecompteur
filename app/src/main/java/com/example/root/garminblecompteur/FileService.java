@@ -23,26 +23,27 @@ public class FileService {
                 .getPath() + "/";
         Log.i("pathEnvironnement", String.valueOf(Environment.getExternalStorageDirectory().listFiles().length));
         String secStore = System.getenv("SECONDARY_STORAGE");
-        return new File(secStore + "/"  + folderName);
+        return new File(secStore + "/" + folderName);
     }
 
     public FileService() {
     }
-    public static FileService getInstance(){
-        Log.i("folderPath","instanciation");
+
+    public static FileService getInstance() {
+        Log.i("folderPath", "instanciation");
 
         return (fileService != null) ? fileService : new FileService();
     }
-    protected ArrayList<FileContainer> getListFile(String folderName){
+
+    protected ArrayList<FileContainer> getListFile(String folderName) {
         ArrayList<FileContainer> arrayListFileContainer = new ArrayList<>();
         File filePointer = setFolderName(folderName);
         Log.i("folderPathgetListFile", String.valueOf(filePointer.listFiles().length));
 
 
-        for( int i=0; i< filePointer.listFiles().length; i++)
-        {
-            Log.i("folderPath",filePointer.listFiles()[i].getName());
-            arrayListFileContainer.add( new FileContainer(filePointer.listFiles()[i].getName(),filePointer.listFiles()[i].getAbsolutePath()));
+        for (int i = 0; i < filePointer.listFiles().length; i++) {
+            Log.i("folderPath", filePointer.listFiles()[i].getName());
+            arrayListFileContainer.add(new FileContainer(filePointer.listFiles()[i].getName(), filePointer.listFiles()[i].getAbsolutePath()));
         }
         return arrayListFileContainer;
     }

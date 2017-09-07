@@ -7,6 +7,7 @@ import android.util.Log;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.services.commons.geojson.GeoJSON;
 
+import org.osmdroid.util.GeoPoint;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -31,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Created by cyrilstern1 on 22/08/2017.
+ * Allow parse readgpx file and convert to arraylist og geopoint
  */
 
 public class XmlToGeoJson {
@@ -43,28 +45,16 @@ public class XmlToGeoJson {
         return xmlToGeoJson;
     }
 
-    public ArrayList<LatLng> decodeXmlToGeoJson(String path, Context ctx) throws ParserConfigurationException, IOException, SAXException, XmlPullParserException {
-//        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-//        DocumentBuilder db = dbf.newDocumentBuilder();
-//        try {
-//            Document doc = db.parse(new InputSource(ctx.getResources().getAssets().open(path)));
-//            doc.getDocumentElement().normalize();
-//            NodeList nodeList = doc.getElementsByTagName("trkseg");
-//            Log.i("testReaer",String.valueOf(nodeList.item(0).getNodeName()));
-//        } catch (SAXException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-//Get the text file
+    public ArrayList<GeoPoint> decodeXmlToGeoJson(String path, Context ctx) throws ParserConfigurationException, IOException, SAXException, XmlPullParserException {
         BufferedReader reader = null;
         StringBuilder sb = new StringBuilder();
         try {
             reader = new BufferedReader(
                     new FileReader(path));
 
-            // do reading, usually loop until end of file reading
+            /**
+            *  do reading, usually loop until end of file reading
+            */
             String mLine;
             while ((mLine = reader.readLine()) != null) {
                 sb.append(mLine);
@@ -79,7 +69,7 @@ public class XmlToGeoJson {
             }
         }
 
-        ArrayList<LatLng> lineStringArray = new ArrayList<LatLng>();
+        ArrayList<GeoPoint> lineStringArray = new ArrayList<GeoPoint>();
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
         XmlPullParser xpp = factory.newPullParser();
@@ -89,7 +79,7 @@ public class XmlToGeoJson {
             if(eventType == XmlPullParser.START_DOCUMENT) {
             } else if(eventType == XmlPullParser.START_TAG) {
                 if (xpp.getAttributeCount() != 0 && xpp.getName().equals("trkpt") ) {
-                    lineStringArray.add(new LatLng(Float.parseFloat(xpp.getAttributeValue(0)),Float.parseFloat(xpp.getAttributeValue(1))));
+                    lineStringArray.add(new GeoPoint(Float.parseFloat(xpp.getAttributeValue(0)),Float.parseFloat(xpp.getAttributeValue(1))));
                 }
 
             } else if(eventType == XmlPullParser.END_TAG) {

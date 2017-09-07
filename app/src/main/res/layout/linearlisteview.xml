@@ -1,34 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp" >
-
-    <ImageView
-        android:id="@+id/avatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        tools:background="#AAA" />
+    android:background="@color/colorAccent"
+    android:padding="10dp">
 
     <TextView
-        android:id="@+id/pseudo"
+        android:id="@+id/devicename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@+id/avatar"
-        android:layout_alignTop="@+id/avatar"
-        android:textStyle="bold"
-        tools:text="Pseudo" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textColor="@color/mapbox_blue"
+        android:textStyle="bold" />
 
-    <TextView android:id="@+id/text"
+    <TextView
+        android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:layout_alignLeft="@+id/pseudo"
-        android:layout_below="@+id/pseudo"
-        tools:text="Texte de mon tweet" />
+        android:layout_below="@+id/devicename"
+        android:textColor="@color/mapbox_blue" />
 
 </RelativeLayout>

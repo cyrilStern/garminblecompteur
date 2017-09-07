@@ -1,14 +1,12 @@
 package com.example.root.garminblecompteur;
 
-import android.app.ListActivity;
+import android.app.ActionBar;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,23 +14,14 @@ import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class lisdevices extends AppCompatActivity{
+public class Listdevices extends AppCompatActivity{
 
     private static final int REQUEST_ENABLE_BT = 11;
     private BluetoothAdapter mBluetoothAdapter;
@@ -53,9 +42,16 @@ public class lisdevices extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lisdevices);
+        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
+        // Remember that you should never show the action bar if the
+        // status bar is hidden, so hide that too if necessary.
+                getSupportActionBar().hide();
         lvDevice = new ArrayList<BluetoothDevice>();
         lv = (ListView) findViewById(R.id.listeviewbluetoothdevice);
-        mLeDeviceListAdapter = new LeDeviceListAdapter(lisdevices.this, lvDevice);
+        mLeDeviceListAdapter = new LeDeviceListAdapter(Listdevices.this, lvDevice);
         lv.setAdapter(mLeDeviceListAdapter);
 
     }
@@ -116,8 +112,11 @@ public class lisdevices extends AppCompatActivity{
                     public void onLeScan(final BluetoothDevice device, int rssi,
                                          byte[] scanRecord) {
                         runOnUiThread(new Runnable() {
+                            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
                             @Override
                             public void run() {
+
+
                                 if (mLeDeviceListAdapter.getPosition(device) == -1) {
                                     mLeDeviceListAdapter.add(device);
                                     mLeDeviceListAdapter.notifyDataSetChanged();

@@ -39,7 +39,7 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".lisdevices" />
+        <activity android:name=".Listdevices" />
 
         <service
             android:name=".getGpxTrace"
