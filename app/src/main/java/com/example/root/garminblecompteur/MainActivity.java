@@ -21,10 +21,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -33,9 +36,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -224,7 +231,8 @@ public class MainActivity extends AppCompatActivity {
     private Marker positionUser;
     private MapView map;
     private Polyline lineSave;
-
+    private Fragment mCurrentFragment;
+    private ViewPager pager;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -236,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
         /**
          * creation fragmentComputer sliding view
          */
-        // Création de la liste de Fragments que fera défiler le PagerAdapter
         setContentView(R.layout.activity_main);
         List fragments = new Vector();
 
@@ -248,12 +255,8 @@ public class MainActivity extends AppCompatActivity {
         // Création de l'adapter qui s'occupera de l'affichage de la liste de
         // Fragments
         this.mPagerAdapter = new ScreenSlidePagerAdapter(super.getSupportFragmentManager(), fragments);
-
-        ViewPager pager = (ViewPager) super.findViewById(R.id.computerpager);
-        // Affectation de l'adapter au ViewPager
+        pager = (ViewPager) super.findViewById(R.id.computerpager);
         pager.setAdapter(this.mPagerAdapter);
-        // Instantiate a ViewPager and a PagerAdapter.
-        android.app.Fragment frag = getFragmentManager().findFragmentByTag(FragmentOne.class.getName());
 
 
 
@@ -281,23 +284,11 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
 
-
-
         /**
          * case poline exist
          */
       //  if(savedInstanceState != null)  map.getOverlayManager().add((Polyline) savedInstanceState.getSerializable("polineSave"));
 //        map.invalidate();
-
-        /**
-         * optional, but a good way to prevent loading from the network and test your zip loading.
-         *
-         */
-     //   map.setUseDataConnection(false);
-
-//        IMapController mapController = map.getController();
-  //      mapController.setZoom(14);
-
 
         /**
          * Creation of the List of traces present in the SDCARD.
@@ -368,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Set the drawer toggle as the DrawerListener
-        getSupportActionBar().hide();
+       // getSupportActionBar().hide();
         textViewCardio = (TextView) findViewById(R.id.textView);
         textViewCadence = (TextView) findViewById(R.id.textView2);
         textViewSpeed = (TextView) findViewById(R.id.textViewspeed);
@@ -387,9 +378,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
     }
-
-
-
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -421,6 +409,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mCurrentFragment = mPagerAdapter.getItem(pager.getCurrentItem());
+
+
+        /**
+         * getTheCurrentFragment
+         */
+
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mCurrentFragment = mPagerAdapter.getItem(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         int off = 0;
         try {
@@ -457,22 +470,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLocationChanged(Location location) {
-//                positionUser.setPosition(new GeoPoint(location.getLatitude(),location.getLongitude()));
-  //              positionUser.setPanToView(true);
-    //            map.getOverlays().add(positionUser);
-      //          map.invalidate();
-                // Do work with new location. Implementation of this method will be covered later.
-//                cameraPosition = new CameraPosition.Builder()
-//                        .target(new LatLng(location.getLatitude(),location.getLongitude())) // Sets the new camera position
-//                        .zoom(15) // Sets the zoom to level 10
-//                        .tilt(20) // Set the camera tilt to 20 degrees
-//                        .build();
-//                if( FIRSTLAUNCH != 1){
-//                    mapboxmap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//                    FIRSTLAUNCH = 1;
-//                }
-//                maker.setPosition(new LatLng(location.getLatitude(),location.getLongitude()));
-
+                if(mCurrentFragment instanceof FragmentOne){
+                    ((FragmentOne) mCurrentFragment).setPositionMarker(location);
+                }
             }
         };
 
@@ -496,9 +496,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void startDicoveredBle (View view){
+    public void startDicoveredBle (){
         Intent intent = new Intent(this,Listdevices.class);
         startActivityForResult(intent,REQUEST_ENABLE_BT);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_first, menu);
+
+        // return true so that the menu pop up is opened
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.bleActivity:
+                startDicoveredBle();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }

@@ -7,6 +7,10 @@ package com.example.root.garminblecompteur.scrollviewinformation;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
+import android.util.SparseArray;
+import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -14,7 +18,7 @@ import java.util.List;
  * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
  * sequence.
  */
-public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
+public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
     private final List fragments;
     private Fragment fragment;
 
@@ -26,8 +30,8 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        Log.i("instantiateItem", "instantiateItem: " + position);
 
-        fragment = (Fragment) fragments.get(position);
         return (Fragment) this.fragments.get(position);
     }
 
@@ -36,9 +40,27 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
         return this.fragments.size();
     }
 
-    public Fragment getVisibleFragment(){
-        if(fragments != null){
-        }
-            return fragments != null ? this.fragment : null;
+    private Fragment mCurrentFragment;
+    SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        Fragment fragment = (Fragment) super.instantiateItem(container, position);
+        Log.i("instantiateItem", "instantiateItem: " + position);
+        registeredFragments.put(position, fragment);
+        return fragment;
     }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        registeredFragments.remove(position);
+        super.destroyItem(container, position, object);
+    }
+
+    public Fragment getRegisteredFragment(int position) {
+        Log.i("instantiateItem", "instantiateItem: " + position);
+
+        return registeredFragments.get(position);
+    }
+
 }
