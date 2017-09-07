@@ -24,6 +24,9 @@ import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
+
+import java.util.Random;
 
 public class FragmentOne extends Fragment {
     private String title;
@@ -110,5 +113,15 @@ public class FragmentOne extends Fragment {
         mapView.invalidate();
 
 
+    }
+
+    public void setTrace(Polyline line) {
+        /**clear Map before add.**/
+        mapView.getOverlays().clear();
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+        line.setColor(color);
+        mapView.getOverlayManager().add(line);
+        mapView.invalidate();
     }
 }

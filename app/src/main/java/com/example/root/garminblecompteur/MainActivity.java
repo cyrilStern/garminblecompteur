@@ -168,12 +168,21 @@ public class MainActivity extends AppCompatActivity {
             }
             if (String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))).equals("Heart Rate Measurement")) {
                 final int heartRate = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
-                runOnUiThread(new Runnable() {
+                new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        textViewCardio.setText(String.valueOf(heartRate));
+                        if(mCurrentFragment instanceof FragmentTwo){
+                            ((FragmentTwo) mCurrentFragment).setHeartCounter(String.valueOf(heartRate));
+                        }
                     }
-                });
+                }).start();
+
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        textViewCardio.setText(String.valueOf(heartRate));
+//                    }
+//                });
             }
 
         }
@@ -249,7 +258,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Ajout des Fragments dans la liste
         fragments.add(Fragment.instantiate(this,FragmentOne.class.getName()));
-        fragments.add(Fragment.instantiate(this,FragmentOne.class.getName()));
         fragments.add(Fragment.instantiate(this,FragmentTwo.class.getName()));
 
         // Création de l'adapter qui s'occupera de l'affichage de la liste de
@@ -302,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
          * Parse SDCARD to get gpxTrace, and feed listview side memnu
          */
         FileService fileService = FileService.getInstance();
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+        if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
             Toast.makeText(this,"this is emulated device",Toast.LENGTH_SHORT).show();
 
         }else{
@@ -322,8 +330,6 @@ public class MainActivity extends AppCompatActivity {
                     XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
                     mDrawerLayout.closeDrawers();
 
-                    /**clear Map before add.**/
-                    map.getOverlays().clear();
 
                     /** Load GpsPoint from reading file.**/
                     try {
@@ -335,10 +341,12 @@ public class MainActivity extends AppCompatActivity {
                         List<GeoPoint> pts = new ArrayList<>();
                         line.setPoints(waypoints);
                         line.setGeodesic(true);
-                        line.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
+                        //line.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
                         lineSave = line;
-                        map.getOverlayManager().add(line);
-                        map.invalidate();
+                        if(mCurrentFragment instanceof FragmentOne){
+                            ((FragmentOne) mCurrentFragment).setTrace(line);
+                        }
+
                     } catch (SAXException e) {
                         e.printStackTrace();
                     } catch (XmlPullParserException e) {
@@ -354,15 +362,6 @@ public class MainActivity extends AppCompatActivity {
                     R.layout.linearlisteviewgpx, listNameGpsFile ));
         }
 
-
-//        positionUser = new Marker(map,getApplicationContext());
-
-
-        // Set the drawer toggle as the DrawerListener
-       // getSupportActionBar().hide();
-        textViewCardio = (TextView) findViewById(R.id.textView);
-        textViewCadence = (TextView) findViewById(R.id.textView2);
-        textViewSpeed = (TextView) findViewById(R.id.textViewspeed);
 
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -388,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("polineSave", (Serializable) lineSave);
+       // outState.putSerializable("polineSave", (Serializable) lineSave);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)

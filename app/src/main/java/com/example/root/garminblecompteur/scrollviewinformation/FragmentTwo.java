@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.root.garminblecompteur.R;
 
@@ -18,6 +19,7 @@ import org.osmdroid.views.MapView;
 public class FragmentTwo extends Fragment {
     private String title;
     private int image;
+    private TextView HeartCounterView;
 
     public static FragmentTwo newInstance(String title) {
         FragmentTwo fragment = new FragmentTwo();
@@ -36,8 +38,11 @@ public class FragmentTwo extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_two, container, false);
-        MapView map = (MapView) view.findViewById(R.id.map);
-        
+        HeartCounterView = (TextView) view.findViewById(R.id.heartView);
+
         return view;
+    }
+    public void setHeartCounter(String heartNbr){
+        HeartCounterView.setText(heartNbr);
     }
 }

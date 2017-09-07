@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">garminblecompteur</string>
+    <string name="app_name">Compteur Ride Sense</string>
     <string name="ble_not_supported">bluetooth low energy not supported</string>
     <string name="unknown_service">service inconu</string>
     <string name="unknown_characteristic">caraterisque inconnu</string>

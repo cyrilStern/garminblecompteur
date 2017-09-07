@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/gpxname"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorAccent"
-    android:id="@+id/gpxname"
+    android:lineSpacingExtra="8sp"
+    android:padding="10dp"
+    android:text="parcour"
     android:textColor="@color/mapbox_blue"
-    android:textSize="12dp"
-    android:padding="10dp">
-</TextView>
+    android:textSize="30dp"
+    android:textStyle="bold"></TextView>

@@ -12,7 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:text="rideSense"
         android:textColor="@color/mapbox_blue"
+        android:textSize="30dp"
         android:textStyle="bold" />
 
     <TextView
