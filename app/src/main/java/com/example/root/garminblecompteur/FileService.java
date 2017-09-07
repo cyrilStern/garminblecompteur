@@ -39,8 +39,6 @@ public class FileService {
         ArrayList<FileContainer> arrayListFileContainer = new ArrayList<>();
         File filePointer = setFolderName(folderName);
         Log.i("folderPathgetListFile", String.valueOf(filePointer.listFiles().length));
-
-
         for (int i = 0; i < filePointer.listFiles().length; i++) {
             Log.i("folderPath", filePointer.listFiles()[i].getName());
             arrayListFileContainer.add(new FileContainer(filePointer.listFiles()[i].getName(), filePointer.listFiles()[i].getAbsolutePath()));

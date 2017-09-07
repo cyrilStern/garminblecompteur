@@ -17,27 +17,35 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.root.garminblecompteur.scrollviewinformation.FragmentOne;
+import com.example.root.garminblecompteur.scrollviewinformation.FragmentTwo;
+import com.example.root.garminblecompteur.scrollviewinformation.ScreenSlidePagerAdapter;
+
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
-import org.osmdroid.bonuspack.routing.Road;
-import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -51,6 +59,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -72,6 +81,21 @@ public class MainActivity extends AppCompatActivity {
     private int mConnectionState = STATE_DISCONNECTED;
     private BluetoothGatt mBluetoothGatt;
     private CalculationBikeCommon calculationBikeCommon;
+    /**
+     * The number of pages (wizard steps) to show in this demo.
+     */
+    private static final int NUM_PAGES = 3;
+
+    /**
+     * The pager widget, which handles animation and allows swiping horizontally to access previous
+     * and next wizard steps.
+     */
+    private ViewPager mPager;
+
+    /**
+     * The pager adapter, which provides the pages to the view pager widget.
+     */
+    private ScreenSlidePagerAdapter mPagerAdapter;
 
     /**
      * CallBack Method Get Service
@@ -201,30 +225,42 @@ public class MainActivity extends AppCompatActivity {
     private MapView map;
     private Polyline lineSave;
 
-    public MainActivity() {
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        org.osmdroid.config.Configuration.getInstance().load(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        Configuration.getInstance().load(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+
+        /**
+         * creation fragmentComputer sliding view
+         */
+        // Création de la liste de Fragments que fera défiler le PagerAdapter
         setContentView(R.layout.activity_main);
+        List fragments = new Vector();
+
+        // Ajout des Fragments dans la liste
+        fragments.add(Fragment.instantiate(this,FragmentOne.class.getName()));
+        fragments.add(Fragment.instantiate(this,FragmentOne.class.getName()));
+        fragments.add(Fragment.instantiate(this,FragmentTwo.class.getName()));
+
+        // Création de l'adapter qui s'occupera de l'affichage de la liste de
+        // Fragments
+        this.mPagerAdapter = new ScreenSlidePagerAdapter(super.getSupportFragmentManager(), fragments);
+
+        ViewPager pager = (ViewPager) super.findViewById(R.id.computerpager);
+        // Affectation de l'adapter au ViewPager
+        pager.setAdapter(this.mPagerAdapter);
+        // Instantiate a ViewPager and a PagerAdapter.
+        android.app.Fragment frag = getFragmentManager().findFragmentByTag(FragmentOne.class.getName());
+
+
 
         /**
          * SideMenuCreation
          */
         final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        FrameLayout fr = (FrameLayout) findViewById(R.id.content_frame);
-
-
         mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
 
@@ -244,44 +280,23 @@ public class MainActivity extends AppCompatActivity {
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        /**
-         * Load Map
-         * Map created for offline with MOBAC
-         */
-        String atlasName = "Google Map";
-        String atlasExtension = ".png";
-        int tileSizePixels = 500;
-        float defaultLatitude = 48.858093f;
-        float defaultLongitude = 2.294694f;
-        int minZoom = 1;
-        int maxZoom = 17;
-        int defaultZoom = 10;
 
-        /**
-         * MapCreationBlock
-         */
-        map = (MapView) findViewById(R.id.map);
-        map.setTileSource(new XYTileSource(atlasName, minZoom, maxZoom, tileSizePixels, atlasExtension, new String[] {}));
-        map.setBuiltInZoomControls(true);
-        map.setBackgroundColor(Color.BLACK);
-        map.getController().setZoom(defaultZoom);
-        map.setClickable(true);
-        map.getController().setCenter(new GeoPoint((int)(defaultLatitude * 1E6), (int)(defaultLongitude * 1E6)));
+
 
         /**
          * case poline exist
          */
-        if(savedInstanceState.getSerializable("polineSave") != null)  map.getOverlayManager().add((Polyline) savedInstanceState.getSerializable("polineSave"));
-        map.invalidate();
+      //  if(savedInstanceState != null)  map.getOverlayManager().add((Polyline) savedInstanceState.getSerializable("polineSave"));
+//        map.invalidate();
 
         /**
          * optional, but a good way to prevent loading from the network and test your zip loading.
          *
          */
-        map.setUseDataConnection(false);
+     //   map.setUseDataConnection(false);
 
-        IMapController mapController = map.getController();
-        mapController.setZoom(14);
+//        IMapController mapController = map.getController();
+  //      mapController.setZoom(14);
 
 
         /**
@@ -296,56 +311,60 @@ public class MainActivity extends AppCompatActivity {
          * Parse SDCARD to get gpxTrace, and feed listview side memnu
          */
         FileService fileService = FileService.getInstance();
-        final ArrayList<FileContainer> arraylistFileContainer = fileService.getListFile("gpstrace");
-        ArrayList<String> listNameGpsFile = new ArrayList<>();
-        for (FileContainer fileGps: arraylistFileContainer) {
-            listNameGpsFile.add(fileGps.getName());
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            Toast.makeText(this,"this is emulated device",Toast.LENGTH_SHORT).show();
+
+        }else{
+            final ArrayList<FileContainer> arraylistFileContainer = fileService.getListFile("gpstrace");
+            ArrayList<String> listNameGpsFile = new ArrayList<>();
+            for (FileContainer fileGps: arraylistFileContainer) {
+                listNameGpsFile.add(fileGps.getName());
+            }
+            /** Bring overlay MenuSide to the front. **/
+            listViewGpsFile.bringToFront();
+
+
+            listViewGpsFile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String pathFromItem = arraylistFileContainer.get(position).getPath();
+                    XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
+                    mDrawerLayout.closeDrawers();
+
+                    /**clear Map before add.**/
+                    map.getOverlays().clear();
+
+                    /** Load GpsPoint from reading file.**/
+                    try {
+                        ArrayList<GeoPoint> waypoints = xmlToGeoJson.decodeXmlToGeoJson(pathFromItem, getApplicationContext());
+                        Polyline line = new Polyline(getApplicationContext());
+                        line.setTitle("Central Park, NYC");
+                        line.setSubDescription(Polyline.class.getCanonicalName());
+                        line.setWidth(20f);
+                        List<GeoPoint> pts = new ArrayList<>();
+                        line.setPoints(waypoints);
+                        line.setGeodesic(true);
+                        line.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
+                        lineSave = line;
+                        map.getOverlayManager().add(line);
+                        map.invalidate();
+                    } catch (SAXException e) {
+                        e.printStackTrace();
+                    } catch (XmlPullParserException e) {
+                        e.printStackTrace();
+                    } catch (ParserConfigurationException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            listViewGpsFile.setAdapter(new ArrayAdapter<String>(this,
+                    R.layout.linearlisteviewgpx, listNameGpsFile ));
         }
 
-        listViewGpsFile.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.linearlisteviewgpx, listNameGpsFile ));
 
-        /** Bring overlay MenuSide to the front. **/
-        listViewGpsFile.bringToFront();
-
-
-        listViewGpsFile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String pathFromItem = arraylistFileContainer.get(position).getPath();
-                XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
-                mDrawerLayout.closeDrawers();
-
-                /**clear Map before add.**/
-                map.getOverlays().clear();
-
-                /** Load GpsPoint from reading file.**/
-                try {
-                    ArrayList<GeoPoint> waypoints = xmlToGeoJson.decodeXmlToGeoJson(pathFromItem, getApplicationContext());
-                    Polyline line = new Polyline(getApplicationContext());
-                    line.setTitle("Central Park, NYC");
-                    line.setSubDescription(Polyline.class.getCanonicalName());
-                    line.setWidth(20f);
-                    List<GeoPoint> pts = new ArrayList<>();
-                    line.setPoints(waypoints);
-                    line.setGeodesic(true);
-                    line.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
-                    lineSave = line;
-                    map.getOverlayManager().add(line);
-                    map.invalidate();
-                } catch (SAXException e) {
-                    e.printStackTrace();
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                } catch (ParserConfigurationException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        positionUser = new Marker(map,getApplicationContext());
+//        positionUser = new Marker(map,getApplicationContext());
 
 
         // Set the drawer toggle as the DrawerListener
@@ -368,6 +387,9 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
     }
+
+
+
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -435,10 +457,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLocationChanged(Location location) {
-                positionUser.setPosition(new GeoPoint(location.getLatitude(),location.getLongitude()));
-                positionUser.setPanToView(true);
-                map.getOverlays().add(positionUser);
-                map.invalidate();
+//                positionUser.setPosition(new GeoPoint(location.getLatitude(),location.getLongitude()));
+  //              positionUser.setPanToView(true);
+    //            map.getOverlays().add(positionUser);
+      //          map.invalidate();
                 // Do work with new location. Implementation of this method will be covered later.
 //                cameraPosition = new CameraPosition.Builder()
 //                        .target(new LatLng(location.getLatitude(),location.getLongitude())) // Sets the new camera position
