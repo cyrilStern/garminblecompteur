@@ -58,7 +58,7 @@ public class FragmentOne extends Fragment {
          * Load Map
          * Map created for offline with MOBAC
          */
-        String atlasName = "Google Map";
+        String atlasName = "Google Maps";
         String atlasExtension = ".png";
         int tileSizePixels = 500;
         float defaultLatitude = 48.858093f;
@@ -105,8 +105,6 @@ public class FragmentOne extends Fragment {
     }
 
     public void setPositionMarker(Location location){
-        Log.i("onLocationChanged", "onLocationChanged: " + String.valueOf(location.getLatitude()));
-
         positionUser.setPosition(new GeoPoint(location.getLatitude(),location.getLongitude()));
         positionUser.setPanToView(true);
         mapView.getOverlays().add(positionUser);

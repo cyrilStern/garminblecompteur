@@ -3,6 +3,7 @@ package com.example.root.garminblecompteur;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Button;
 
 /**
  * Created by cyrilstern1 on 15/08/2017.

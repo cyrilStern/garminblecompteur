@@ -64,8 +64,9 @@ public class Listdevices extends AppCompatActivity{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 BluetoothDevice bluetoothDevice = (BluetoothDevice) parent.getItemAtPosition(position);
-                Intent i = new Intent();
+                Intent i = new Intent(getApplicationContext(),BluetoothServiceGat.class);
                 i.putExtra("DEVICE", (Parcelable) bluetoothDevice);
+                startService(i);
                 setResult(RESULT_OK, i);
                 mBluetoothAdapter.cancelDiscovery();
                 finish();

@@ -9,8 +9,10 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -47,6 +49,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.root.garminblecompteur.bluethoofRepo.BleBroadcst;
 import com.example.root.garminblecompteur.scrollviewinformation.FragmentOne;
 import com.example.root.garminblecompteur.scrollviewinformation.FragmentTwo;
 import com.example.root.garminblecompteur.scrollviewinformation.ScreenSlidePagerAdapter;
@@ -109,128 +112,124 @@ public class MainActivity extends AppCompatActivity {
      * ToDo: Make Class outside Main
      */
 
-    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            Log.i("onConnectionStateChange", "Status: " + status);
-            switch (newState) {
-                case BluetoothProfile.STATE_CONNECTED:
-                    Log.i("gattCallback", "STATE_CONNECTED");
-                    gatt.discoverServices();
-                    break;
-                case BluetoothProfile.STATE_DISCONNECTED:
-                    Log.e("gattCallback", "STATE_DISCONNECTED");
-                    break;
-                default:
-                    Log.e("gattCallback", "STATE_OTHER");
-            }
-
-        }
-
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            if (String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))).equals("CSC Measurement")) {
-                int offset = 0;
-                offset += 1;
-                Log.i("onCharacteristicChange", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))));
-
-                int wheelRevolutions = 0;
-                int lastWheelEventTime = 0;
-                if (true) {
-                    wheelRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, offset);
-                    offset += 4;
-
-                    lastWheelEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset); // 1/1024 s
-                    offset += 2;
-                }
-                int crankRevolutions = 0;
-                int lastCrankEventTime = 0;
-                if (true) {
-                    crankRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
-                    offset += 2;
-
-                    lastCrankEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
-                    offset += 2;
-
-                }
-                final int finalWheelRevolutions = wheelRevolutions;
-                final int finalCrankRevolutions = crankRevolutions;
-                final int finalLastCrankEventTime = lastCrankEventTime;
-                final int finalLastWheelEventTime = lastWheelEventTime;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        textViewCadence.setText(String.valueOf(finalWheelRevolutions));
-                        final String speed = String.valueOf(calculationBikeCommon.speedcalculation(finalWheelRevolutions, finalLastWheelEventTime));
-                        textViewSpeed.setText(String.valueOf(speed));
-                    }
-                });
-            }
-            if (String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))).equals("Heart Rate Measurement")) {
-                final int heartRate = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(mCurrentFragment instanceof FragmentTwo){
-                            ((FragmentTwo) mCurrentFragment).setHeartCounter(String.valueOf(heartRate));
-                        }
-                    }
-                }).start();
-
+//    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+//        @Override
+//        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+//            Log.i("onConnectionStateChange", "Status: " + status);
+//            switch (newState) {
+//                case BluetoothProfile.STATE_CONNECTED:
+//                    Log.i("gattCallback", "STATE_CONNECTED");
+//                    gatt.discoverServices();
+//                    break;
+//                case BluetoothProfile.STATE_DISCONNECTED:
+//                    Log.e("gattCallback", "STATE_DISCONNECTED");
+//                    break;
+//                default:
+//                    Log.e("gattCallback", "STATE_OTHER");
+//            }
+//
+//        }
+//
+//        @Override
+//        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+//            if (String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))).equals("CSC Measurement")) {
+//                int offset = 0;
+//                offset += 1;
+//                Log.i("onCharacteristicChange", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))));
+//
+//                int wheelRevolutions = 0;
+//                int lastWheelEventTime = 0;
+//                if (true) {
+//                    wheelRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, offset);
+//                    offset += 4;
+//
+//                    lastWheelEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset); // 1/1024 s
+//                    offset += 2;
+//                }
+//                int crankRevolutions = 0;
+//                int lastCrankEventTime = 0;
+//                if (true) {
+//                    crankRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
+//                    offset += 2;
+//
+//                    lastCrankEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
+//                    offset += 2;
+//
+//                }
+//                final int finalWheelRevolutions = wheelRevolutions;
+//                final int finalCrankRevolutions = crankRevolutions;
+//                final int finalLastCrankEventTime = lastCrankEventTime;
+//                final int finalLastWheelEventTime = lastWheelEventTime;
 //                runOnUiThread(new Runnable() {
 //                    @Override
 //                    public void run() {
-//                        textViewCardio.setText(String.valueOf(heartRate));
+//                        textViewCadence.setText(String.valueOf(finalWheelRevolutions));
+//                        final String speed = String.valueOf(calculationBikeCommon.speedcalculation(finalWheelRevolutions, finalLastWheelEventTime));
+//                        textViewSpeed.setText(String.valueOf(speed));
 //                    }
 //                });
-            }
+//            }
+//            if (String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))).equals("Heart Rate Measurement")) {
+//                final int heartRate = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if(mCurrentFragment instanceof FragmentTwo){
+//                            ((FragmentTwo) mCurrentFragment).setHeartCounter(String.valueOf(heartRate));
+//                            BleBroadcst b = new BleBroadcst();
+//
+//                        }
+//                    }
+//                }).start();
+//
+//            }
+//
+//        }
 
-        }
-
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            List<BluetoothGattService> services = gatt.getServices();
-            Log.i("onServicesDiscovered", services.toString());
-
-            for (BluetoothGattService service : services) {
-                Log.i("onServicesDiscovered1", String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())));
-                if (String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())).equals("Cycling Speed and Cadence")) {
-                    for (BluetoothGattCharacteristic cara : service.getCharacteristics()) {
-                        gatt.setCharacteristicNotification(cara, true);
-                        Log.i("onServicesDiscovered2", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(cara.getUuid()))));
-
-
-                        for (BluetoothGattDescriptor descriptor : cara.getDescriptors()) {
-                            //find descriptor UUID that matches Client Characteristic Configuration (0x2902)
-                            // and then call setValue on that descriptor
-                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                            gatt.writeDescriptor(descriptor);
-                        }
-                    }
-                }
-                if (String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())).equals("Heart Rate")) {
-                    for (BluetoothGattCharacteristic cara : service.getCharacteristics()) {
-                        gatt.setCharacteristicNotification(cara, true);
-                        Log.i("onServicesDiscovered2", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(cara.getUuid()))));
-                        for (BluetoothGattDescriptor descriptor : cara.getDescriptors()) {
-                            //find descriptor UUID that matches Client Characteristic Configuration (0x2902)
-                            // and then call setValue on that descriptor
-                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                            gatt.writeDescriptor(descriptor);
-                        }
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                                         BluetoothGattCharacteristic
-                                                 characteristic, int status) {
-
-        }
-    };
+//        @RequiresApi(api = Build.VERSION_CODES.N)
+//        @Override
+//        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+//            List<BluetoothGattService> services = gatt.getServices();
+//            Log.i("onServicesDiscovered", services.toString());
+//
+//            for (BluetoothGattService service : services) {
+//                Log.i("onServicesDiscovered1", String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())));
+//                if (String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())).equals("Cycling Speed and Cadence")) {
+//                    for (BluetoothGattCharacteristic cara : service.getCharacteristics()) {
+//                        gatt.setCharacteristicNotification(cara, true);
+//                        Log.i("onServicesDiscovered2", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(cara.getUuid()))));
+//
+//
+//                        for (BluetoothGattDescriptor descriptor : cara.getDescriptors()) {
+//                            //find descriptor UUID that matches Client Characteristic Configuration (0x2902)
+//                            // and then call setValue on that descriptor
+//                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+//                            gatt.writeDescriptor(descriptor);
+//                        }
+//                    }
+//                }
+//                if (String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())).equals("Heart Rate")) {
+//                    for (BluetoothGattCharacteristic cara : service.getCharacteristics()) {
+//                        gatt.setCharacteristicNotification(cara, true);
+//                        Log.i("onServicesDiscovered2", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(cara.getUuid()))));
+//                        for (BluetoothGattDescriptor descriptor : cara.getDescriptors()) {
+//                            //find descriptor UUID that matches Client Characteristic Configuration (0x2902)
+//                            // and then call setValue on that descriptor
+//                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+//                            gatt.writeDescriptor(descriptor);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        @Override
+//        public void onCharacteristicRead(BluetoothGatt gatt,
+//                                         BluetoothGattCharacteristic
+//                                                 characteristic, int status) {
+//
+//        }
+//    };
 
 
     private ActionBarDrawerToggle mDrawerToggle;
@@ -249,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Configuration.getInstance().load(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
-
+        calculationBikeCommon = new CalculationBikeCommon();
         /**
          * creation fragmentComputer sliding view
          */
@@ -321,8 +320,6 @@ public class MainActivity extends AppCompatActivity {
             }
             /** Bring overlay MenuSide to the front. **/
             listViewGpsFile.bringToFront();
-
-
             listViewGpsFile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -334,6 +331,8 @@ public class MainActivity extends AppCompatActivity {
                     /** Load GpsPoint from reading file.**/
                     try {
                         ArrayList<GeoPoint> waypoints = xmlToGeoJson.decodeXmlToGeoJson(pathFromItem, getApplicationContext());
+
+                        // depra
                         Polyline line = new Polyline(getApplicationContext());
                         line.setTitle("Central Park, NYC");
                         line.setSubDescription(Polyline.class.getCanonicalName());
@@ -396,9 +395,71 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ENABLE_BT) {
             if (resultCode == RESULT_OK) {
-                BluetoothDevice bluetoothDevice = data.getParcelableExtra("DEVICE");
+
+                BroadcastReceiver mbluetoothServiceGat = new BleBroadcst() {
+                    private void speedCadenceAction(final Intent intent){
+                        Log.i(getPackageName(), "speedCadenceAction: ");
+                        if(mCurrentFragment instanceof FragmentTwo){
+                            Log.i(getPackageName(), "speedCadenceAction: ");
+
+                            ((FragmentTwo) mCurrentFragment).setHeartCounter("heartrate");
+                        }
+                        this.setmContextView(textViewCadence);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Bundle b = intent.getExtras();
+                                String speed = String.valueOf(calculationBikeCommon.speedcalculation(b.getInt("WheelRevolution"),b.getInt("CrankRevolutions")));
+                                if(mCurrentFragment instanceof FragmentTwo){
+                                    Log.i(getPackageName(), "speedCadenceAction: ");
+
+                                    ((FragmentTwo) mCurrentFragment).setHeartCounter(speed);
+                                }
+
+                            }
+                        });
+
+                    }
+                    private void speedHeartAction(final Intent intent){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Bundle b = intent.getExtras();
+                                textViewCardio.setText(String.valueOf(b.get("heartRate")));
+                            }
+                        });
+
+                    }
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        Log.i(getPackageName(), "onReceive: broadcastreceiveraction: " + intent.getAction());
+                        Bundle b  = intent.getExtras();
+
+                        switch (b.getString("filter")){
+                            case BluetoothServiceGat.HEART_RATE:
+                                speedHeartAction(intent);
+                                break;
+                            case BluetoothServiceGat.SPEED_CADENCE:
+                                speedCadenceAction(intent);
+                                break;
+                            default:
+
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                            }
+                        });
+                    }
+                };
+
+                IntentFilter filter= new IntentFilter(BluetoothServiceGat.ACTION_BLE_SERVICE);
+                getApplicationContext().registerReceiver(mbluetoothServiceGat,filter);
+
+                //BluetoothDevice bluetoothDevice = data.getParcelableExtra("DEVICE");
                 // Log.i("thisisit",bluetoothDevice.getName());
-                bluetoothDevice.connectGatt(this,false,gattCallback);
+                //bluetoothDevice.connectGatt(this,false,gattCallback);
             }
 
         }
