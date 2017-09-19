@@ -6,9 +6,12 @@ package com.example.root.garminblecompteur.scrollviewinformation;
 
 
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +28,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.util.Random;
 
@@ -32,7 +36,7 @@ public class FragmentOne extends Fragment {
     private String title;
     private int image;
     public static MapView mapView;
-    private  Marker currentMarker;
+    private Marker currentMarker;
     private Marker positionUser;
 
 
@@ -51,6 +55,7 @@ public class FragmentOne extends Fragment {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -73,6 +78,9 @@ public class FragmentOne extends Fragment {
         mapView.setClickable(true);
         mapView.getController().setCenter(new GeoPoint((int)(defaultLatitude * 1E6), (int)(defaultLongitude * 1E6)));
         positionUser = new Marker(mapView,getActivity().getApplicationContext());
+        positionUser.setIcon(getActivity().getDrawable(R.drawable.meposition));
+        positionUser.setAnchor(Marker.ANCHOR_CENTER,Marker.ANCHOR_BOTTOM);
+        positionUser.setInfoWindow(new MarkerInfoWindow(R.layout.marker_info_layout,mapView));
 
         /**
          * optional, but a good way to prevent loading from the network and test your zip loading.
@@ -121,5 +129,12 @@ public class FragmentOne extends Fragment {
         line.setColor(color);
         mapView.getOverlayManager().add(line);
         mapView.invalidate();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.destroyDrawingCache();
+
     }
 }

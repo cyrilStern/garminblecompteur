@@ -35,7 +35,7 @@ public class FileService {
         return (fileService != null) ? fileService : new FileService();
     }
 
-    protected ArrayList<FileContainer> getListFile(String folderName) {
+    public ArrayList<FileContainer> getListFile(String folderName) {
         ArrayList<FileContainer> arrayListFileContainer = new ArrayList<>();
         File filePointer = setFolderName(folderName);
         Log.i("folderPathgetListFile", String.valueOf(filePointer.listFiles().length));

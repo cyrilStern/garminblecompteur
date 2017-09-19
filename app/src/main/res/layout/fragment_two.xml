@@ -9,50 +9,81 @@
 
 
     <TextView
-        android:id="@+id/heartView"
-        android:layout_width="178dp"
-        android:layout_height="228dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="27dp"
-        android:alpha="1"
-        android:autoText="true"
-        android:gravity="center"
-        android:text="N/A"
-        android:textAllCaps="true"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.DropDownItem"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="90dp"
-        android:textStyle="normal|bold"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/textView4"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="34" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="168dp"
-        android:layout_height="228dp"
+        android:id="@+id/cadencespeed"
+        android:layout_width="157dp"
+        android:layout_height="161dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="6dp"
+        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/circle_main_heart"
         android:gravity="center"
         android:textColor="@android:color/black"
         android:textSize="@android:dimen/app_icon_size"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="56" />
+        app:layout_constraintTop_toBottomOf="@+id/distancecounter"
+        app:layout_constraintVertical_bias="0.858"
+        tools:text="1020" />
 
     <TextView
-        android:id="@+id/textView5"
-        android:layout_width="181dp"
-        android:layout_height="238dp"
+        android:id="@+id/distancecounter"
+        android:layout_width="163dp"
+        android:layout_height="163dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/circle_main_heart"
         android:gravity="center"
-        android:textSize="56dip"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="262dp"
-        tools:text="56" />
+        android:text="56"
+        android:textSize="80dip"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="56"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <TextView
+        android:id="@+id/heartView"
+        android:layout_width="291dp"
+        android:layout_height="315dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="29dp"
+        android:alpha="1"
+        android:autoText="true"
+        android:background="@drawable/circle_main_heart"
+        android:gravity="center"
+        android:text="00"
+        android:textAllCaps="true"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.DropDownItem"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="140dp"
+        android:textStyle="normal|bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.503"
+        tools:layout_editor_absoluteY="45dp"
+        tools:text="34" />
+
+    <ImageView
+        android:id="@+id/heartimageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/heart"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageView
+        android:id="@+id/mImageViewCadence"
+        android:layout_width="58dp"
+        android:layout_height="55dp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/cadence" />
 
 </android.support.constraint.ConstraintLayout>

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,13 +42,13 @@ public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
     }
 
     private Fragment mCurrentFragment;
-    SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+    ArrayList<Fragment> registeredFragments = new ArrayList<>();
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         Fragment fragment = (Fragment) super.instantiateItem(container, position);
         Log.i("instantiateItem", "instantiateItem: " + position);
-        registeredFragments.put(position, fragment);
+        registeredFragments.add(position, fragment);
         return fragment;
     }
 
@@ -58,8 +59,6 @@ public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public Fragment getRegisteredFragment(int position) {
-        Log.i("instantiateItem", "instantiateItem: " + position);
-
         return registeredFragments.get(position);
     }
 

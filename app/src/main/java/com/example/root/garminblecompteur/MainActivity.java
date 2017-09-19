@@ -1,20 +1,17 @@
 package com.example.root.garminblecompteur;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -23,50 +20,42 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.root.garminblecompteur.alertDialogRepo.AlertDialogCompose;
 import com.example.root.garminblecompteur.bluethoofRepo.BleBroadcst;
 import com.example.root.garminblecompteur.scrollviewinformation.FragmentOne;
+import com.example.root.garminblecompteur.scrollviewinformation.FragmentThree;
 import com.example.root.garminblecompteur.scrollviewinformation.FragmentTwo;
 import com.example.root.garminblecompteur.scrollviewinformation.ScreenSlidePagerAdapter;
-
-import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
-import org.osmdroid.views.overlay.infowindow.BasicInfoWindow;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -74,22 +63,12 @@ import java.util.Vector;
 import javax.xml.parsers.ParserConfigurationException;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AlertDialogCompose.NoticeDialogListener{
     private static final int REQUEST_ENABLE_BT = 11;
-    private static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    private static final int STATE_CONNECTED = 2;
-    private static String REQUESTDEVICEBLE = "deviceWanted";
     private final String TAG = LeDeviceListAdapter.class.getName();
     private BluetoothAdapter mBluetoothAdapter;
     private LocationManager locationManager;
-    private boolean mScanning;
-    private Handler mHandler;
-    private TextView textViewCardio,textViewSpeed;
-    private TextView textViewCadence;
     private List<BluetoothDevice> lvDevice;
-    private int mConnectionState = STATE_DISCONNECTED;
-    private BluetoothGatt mBluetoothGatt;
     private CalculationBikeCommon calculationBikeCommon;
     /**
      * The number of pages (wizard steps) to show in this demo.
@@ -107,133 +86,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private ScreenSlidePagerAdapter mPagerAdapter;
 
-    /**
-     * CallBack Method Get Service
-     * ToDo: Make Class outside Main
-     */
-
-//    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
-//        @Override
-//        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-//            Log.i("onConnectionStateChange", "Status: " + status);
-//            switch (newState) {
-//                case BluetoothProfile.STATE_CONNECTED:
-//                    Log.i("gattCallback", "STATE_CONNECTED");
-//                    gatt.discoverServices();
-//                    break;
-//                case BluetoothProfile.STATE_DISCONNECTED:
-//                    Log.e("gattCallback", "STATE_DISCONNECTED");
-//                    break;
-//                default:
-//                    Log.e("gattCallback", "STATE_OTHER");
-//            }
-//
-//        }
-//
-//        @Override
-//        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-//            if (String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))).equals("CSC Measurement")) {
-//                int offset = 0;
-//                offset += 1;
-//                Log.i("onCharacteristicChange", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))));
-//
-//                int wheelRevolutions = 0;
-//                int lastWheelEventTime = 0;
-//                if (true) {
-//                    wheelRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, offset);
-//                    offset += 4;
-//
-//                    lastWheelEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset); // 1/1024 s
-//                    offset += 2;
-//                }
-//                int crankRevolutions = 0;
-//                int lastCrankEventTime = 0;
-//                if (true) {
-//                    crankRevolutions = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
-//                    offset += 2;
-//
-//                    lastCrankEventTime = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, offset);
-//                    offset += 2;
-//
-//                }
-//                final int finalWheelRevolutions = wheelRevolutions;
-//                final int finalCrankRevolutions = crankRevolutions;
-//                final int finalLastCrankEventTime = lastCrankEventTime;
-//                final int finalLastWheelEventTime = lastWheelEventTime;
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        textViewCadence.setText(String.valueOf(finalWheelRevolutions));
-//                        final String speed = String.valueOf(calculationBikeCommon.speedcalculation(finalWheelRevolutions, finalLastWheelEventTime));
-//                        textViewSpeed.setText(String.valueOf(speed));
-//                    }
-//                });
-//            }
-//            if (String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))).equals("Heart Rate Measurement")) {
-//                final int heartRate = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        if(mCurrentFragment instanceof FragmentTwo){
-//                            ((FragmentTwo) mCurrentFragment).setHeartCounter(String.valueOf(heartRate));
-//                            BleBroadcst b = new BleBroadcst();
-//
-//                        }
-//                    }
-//                }).start();
-//
-//            }
-//
-//        }
-
-//        @RequiresApi(api = Build.VERSION_CODES.N)
-//        @Override
-//        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-//            List<BluetoothGattService> services = gatt.getServices();
-//            Log.i("onServicesDiscovered", services.toString());
-//
-//            for (BluetoothGattService service : services) {
-//                Log.i("onServicesDiscovered1", String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())));
-//                if (String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())).equals("Cycling Speed and Cadence")) {
-//                    for (BluetoothGattCharacteristic cara : service.getCharacteristics()) {
-//                        gatt.setCharacteristicNotification(cara, true);
-//                        Log.i("onServicesDiscovered2", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(cara.getUuid()))));
-//
-//
-//                        for (BluetoothGattDescriptor descriptor : cara.getDescriptors()) {
-//                            //find descriptor UUID that matches Client Characteristic Configuration (0x2902)
-//                            // and then call setValue on that descriptor
-//                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-//                            gatt.writeDescriptor(descriptor);
-//                        }
-//                    }
-//                }
-//                if (String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())).equals("Heart Rate")) {
-//                    for (BluetoothGattCharacteristic cara : service.getCharacteristics()) {
-//                        gatt.setCharacteristicNotification(cara, true);
-//                        Log.i("onServicesDiscovered2", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(cara.getUuid()))));
-//                        for (BluetoothGattDescriptor descriptor : cara.getDescriptors()) {
-//                            //find descriptor UUID that matches Client Characteristic Configuration (0x2902)
-//                            // and then call setValue on that descriptor
-//                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-//                            gatt.writeDescriptor(descriptor);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        @Override
-//        public void onCharacteristicRead(BluetoothGatt gatt,
-//                                         BluetoothGattCharacteristic
-//                                                 characteristic, int status) {
-//
-//        }
-//    };
 
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private int FIRSTLAUNCH = 0;
     private File file;
     private ListView listViewGpsFile;
     private Marker positionUser;
@@ -249,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
         Configuration.getInstance().load(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         calculationBikeCommon = new CalculationBikeCommon();
+
         /**
          * creation fragmentComputer sliding view
          */
@@ -258,14 +114,14 @@ public class MainActivity extends AppCompatActivity {
         // Ajout des Fragments dans la liste
         fragments.add(Fragment.instantiate(this,FragmentOne.class.getName()));
         fragments.add(Fragment.instantiate(this,FragmentTwo.class.getName()));
+        fragments.add(Fragment.instantiate(this,FragmentThree.class.getName()));
 
         // Création de l'adapter qui s'occupera de l'affichage de la liste de
         // Fragments
-        this.mPagerAdapter = new ScreenSlidePagerAdapter(super.getSupportFragmentManager(), fragments);
         pager = (ViewPager) super.findViewById(R.id.computerpager);
+        this.mPagerAdapter = new ScreenSlidePagerAdapter(super.getSupportFragmentManager(), fragments);
         pager.setAdapter(this.mPagerAdapter);
-
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         /**
          * SideMenuCreation
@@ -277,14 +133,14 @@ public class MainActivity extends AppCompatActivity {
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                //    getActionBar().setTitle("");
+                getSupportActionBar().setTitle("RideSence Live");
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-//                getActionBar().setTitle("menu");
+                getSupportActionBar().setTitle("Parcours");
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
@@ -336,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         Polyline line = new Polyline(getApplicationContext());
                         line.setTitle("Central Park, NYC");
                         line.setSubDescription(Polyline.class.getCanonicalName());
-                        line.setWidth(20f);
+                        line.setWidth(10);
                         List<GeoPoint> pts = new ArrayList<>();
                         line.setPoints(waypoints);
                         line.setGeodesic(true);
@@ -360,8 +216,6 @@ public class MainActivity extends AppCompatActivity {
             listViewGpsFile.setAdapter(new ArrayAdapter<String>(this,
                     R.layout.linearlisteviewgpx, listNameGpsFile ));
         }
-
-
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
@@ -404,16 +258,15 @@ public class MainActivity extends AppCompatActivity {
 
                             ((FragmentTwo) mCurrentFragment).setHeartCounter("heartrate");
                         }
-                        this.setmContextView(textViewCadence);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 Bundle b = intent.getExtras();
                                 String speed = String.valueOf(calculationBikeCommon.speedcalculation(b.getInt("WheelRevolution"),b.getInt("CrankRevolutions")));
                                 if(mCurrentFragment instanceof FragmentTwo){
-                                    Log.i(getPackageName(), "speedCadenceAction: ");
+                                    Log.i(getPackageName(), "speedCadenceAction: " + speed);
 
-                                    ((FragmentTwo) mCurrentFragment).setHeartCounter(speed);
+                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(speed);
                                 }
 
                             }
@@ -425,7 +278,10 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 Bundle b = intent.getExtras();
-                                textViewCardio.setText(String.valueOf(b.get("heartRate")));
+                                if(mCurrentFragment instanceof FragmentTwo){
+                                    Log.i(getPackageName(), "heartRate: " + (b.getString("heartRate")));
+                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(b.getString("heartRate"));
+                                }
                             }
                         });
 
@@ -471,13 +327,11 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         mCurrentFragment = mPagerAdapter.getItem(pager.getCurrentItem());
 
-
         /**
          * getTheCurrentFragment
          */
 
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
 
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -495,6 +349,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        /**
+         * dialog box if location is diseable on starting.
+         */
+
         int off = 0;
         try {
             off = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
@@ -502,8 +361,8 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         if (off == 0) {
-            Intent onGPS = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(onGPS);
+            AlertDialogCompose alertDialgCompose = AlertDialogCompose.newInstance("Votre service de localisation n'est pas allumé, désirez vous le connecter?", "oui","non");
+            alertDialgCompose.show(getFragmentManager(),"alertLocation");
         }
         locationManager = (LocationManager) this
                 .getSystemService(Context.LOCATION_SERVICE);
@@ -581,4 +440,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Intent onGPS = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(onGPS);
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+    }
 }
