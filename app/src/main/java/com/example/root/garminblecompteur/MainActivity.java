@@ -15,7 +15,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
@@ -30,8 +29,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -43,20 +40,13 @@ import com.example.root.garminblecompteur.scrollviewinformation.FragmentTwo;
 import com.example.root.garminblecompteur.scrollviewinformation.ScreenSlidePagerAdapter;
 
 import org.osmdroid.config.Configuration;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MainActivity extends AppCompatActivity implements AlertDialogCompose.NoticeDialogListener{
@@ -160,60 +150,9 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
         listViewGpsFile = (ListView) findViewById(R.id.left_drawer);
 
 
-        /**
-         * Parse SDCARD to get gpxTrace, and feed listview side memnu
-         */
-        FileService fileService = FileService.getInstance();
-        if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-            Toast.makeText(this,"this is emulated device",Toast.LENGTH_SHORT).show();
-
-        }else{
-            final ArrayList<FileContainer> arraylistFileContainer = fileService.getListFile("gpstrace");
-            ArrayList<String> listNameGpsFile = new ArrayList<>();
-            for (FileContainer fileGps: arraylistFileContainer) {
-                listNameGpsFile.add(fileGps.getName());
-            }
-            /** Bring overlay MenuSide to the front. **/
-            listViewGpsFile.bringToFront();
-            listViewGpsFile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String pathFromItem = arraylistFileContainer.get(position).getPath();
-                    XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
-                    mDrawerLayout.closeDrawers();
-
-
-                    /** Load GpsPoint from reading file.**/
-                    try {
-                        ArrayList<GeoPoint> waypoints = xmlToGeoJson.decodeXmlToGeoJson(pathFromItem, getApplicationContext());
-
-                        // depra
-                        Polyline line = new Polyline(getApplicationContext());
-                        line.setTitle("Central Park, NYC");
-                        line.setSubDescription(Polyline.class.getCanonicalName());
-                        line.setWidth(10);
-                        line.setPoints(waypoints);
-                        line.setGeodesic(true);
-                        //line.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
-                        lineSave = line;
-                        if (mCurrentFragment instanceof FragmentOne) {
-                            ((FragmentOne) mCurrentFragment).setTrace(line);
-                        }
-
-                    } catch (SAXException e) {
-                        e.printStackTrace();
-                    } catch (XmlPullParserException e) {
-                        e.printStackTrace();
-                    } catch (ParserConfigurationException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            listViewGpsFile.setAdapter(new ArrayAdapter<String>(this,
-                    R.layout.linearlisteviewgpx, listNameGpsFile ));
-        }
+//            listViewGpsFile.setAdapter(new ArrayAdapter<String>(this,
+//                    R.layout.linearlisteviewgpx, listNameGpsFile ));
+//
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
@@ -330,10 +269,26 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
          */
 
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
+            /**
+             * set title actionBar
+             *
+             * @param position
+             * @param positionOffset
+             * @param positionOffsetPixels
+             */
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+                switch (position) {
+                    case 0:
+                        getSupportActionBar().setTitle(ScreenSlidePagerAdapter.FRAGMENT0);
+                        break;
+                    case 1:
+                        getSupportActionBar().setTitle(ScreenSlidePagerAdapter.FRAGMENT1);
+                        break;
+                    case 2:
+                        getSupportActionBar().setTitle(ScreenSlidePagerAdapter.FRAGMENT2);
+                        break;
+                }
             }
 
             @Override

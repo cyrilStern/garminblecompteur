@@ -104,6 +104,8 @@ public class FragmentOne extends Fragment {
         IMapController mapController = mapView.getController();
         mapController.setZoom(5);
         mapView.invalidate();
+        mapView.setBuiltInZoomControls(false);
+
 
     }
 

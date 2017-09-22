@@ -62,16 +62,12 @@ public class CardTraceAdapteur extends RecyclerView.Adapter<CardTraceAdapteur.Vi
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
             @Override
             public void onClick(View v) {
-                String pathFromItem = mDataset.get(position);
                 XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
-
                 /** Load GpsPoint from reading file.**/
                 try {
                     ArrayList<GeoPoint> waypoints = xmlToGeoJson.decodeXmlToGeoJson(marraylistFileContainer.get(position).getPath(), mactivity.getApplicationContext());
-                    Log.i("arrayList", "onClick: " + waypoints.get(0).getLatitude() + pathFromItem);
-                    // depra
                     Polyline line = new Polyline();
-                    line.setTitle("Central Park, NYC");
+                    line.setTitle(mDataset.get(position));
                     line.setSubDescription(Polyline.class.getCanonicalName());
                     line.setWidth(10);
                     List<GeoPoint> pts = new ArrayList<>();

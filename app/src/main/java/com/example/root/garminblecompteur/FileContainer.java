@@ -8,6 +8,11 @@ public class FileContainer{
     private String path;
     private String name;
 
+    public FileContainer(String name, String path) {
+        this.path = path;
+        this.name = name.replace(".gpx", "");
+    }
+
     public String getPath() {
         return path;
     }
@@ -21,11 +26,6 @@ public class FileContainer{
     }
 
     public void setName(String name) {
-        this.name = name;
-    }
-
-    public FileContainer(String name, String path) {
-        this.path = path;
         this.name = name;
     }
 }

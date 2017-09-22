@@ -6,10 +6,8 @@ package com.example.root.garminblecompteur.scrollviewinformation;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -20,8 +18,13 @@ import java.util.List;
  * sequence.
  */
 public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+    public static String FRAGMENT0 = "Carte";
+    public static String FRAGMENT1 = "Compteur";
+    public static String FRAGMENT2 = "Trace";
     private final List fragments;
+    ArrayList<Fragment> registeredFragments = new ArrayList<>();
     private Fragment fragment;
+    private Fragment mCurrentFragment;
 
     //On fournit à l'adapter la liste des fragments à afficher
     public ScreenSlidePagerAdapter(FragmentManager fm, List fragments) {
@@ -40,9 +43,6 @@ public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return this.fragments.size();
     }
-
-    private Fragment mCurrentFragment;
-    ArrayList<Fragment> registeredFragments = new ArrayList<>();
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
