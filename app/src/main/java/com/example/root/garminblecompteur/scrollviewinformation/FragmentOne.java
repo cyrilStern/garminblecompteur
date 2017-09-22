@@ -6,7 +6,6 @@ package com.example.root.garminblecompteur.scrollviewinformation;
 
 
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,8 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.root.garminblecompteur.R;
 
@@ -33,9 +30,9 @@ import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import java.util.Random;
 
 public class FragmentOne extends Fragment {
+    public static MapView mapView;
     private String title;
     private int image;
-    public static MapView mapView;
     private Marker currentMarker;
     private Marker positionUser;
 
@@ -78,8 +75,8 @@ public class FragmentOne extends Fragment {
         mapView.setClickable(true);
         mapView.getController().setCenter(new GeoPoint((int)(defaultLatitude * 1E6), (int)(defaultLongitude * 1E6)));
         positionUser = new Marker(mapView,getActivity().getApplicationContext());
-        positionUser.setIcon(getActivity().getDrawable(R.drawable.meposition));
-        positionUser.setAnchor(Marker.ANCHOR_CENTER,Marker.ANCHOR_BOTTOM);
+        positionUser.setIcon(getActivity().getDrawable(R.drawable.arrow_direction));
+        positionUser.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
         positionUser.setInfoWindow(new MarkerInfoWindow(R.layout.marker_info_layout,mapView));
 
         /**
@@ -95,7 +92,7 @@ public class FragmentOne extends Fragment {
     }
 
     public View getmapView(){
-        return this.mapView;
+        return mapView;
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -113,12 +110,12 @@ public class FragmentOne extends Fragment {
     }
 
     public void setPositionMarker(Location location){
-        positionUser.setPosition(new GeoPoint(location.getLatitude(),location.getLongitude()));
-        positionUser.setPanToView(true);
-        mapView.getOverlays().add(positionUser);
-        mapView.invalidate();
-
-
+        if (mapView != null) {
+            positionUser.setPosition(new GeoPoint(location.getLatitude(), location.getLongitude()));
+            positionUser.setPanToView(true);
+            mapView.getOverlays().add(positionUser);
+            mapView.invalidate();
+        }
     }
 
     public void setTrace(Polyline line) {
@@ -127,6 +124,7 @@ public class FragmentOne extends Fragment {
         Random rnd = new Random();
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
         line.setColor(color);
+        Log.i("viewholder", "onClick: " + line.getTitle());
         mapView.getOverlayManager().add(line);
         mapView.invalidate();
     }

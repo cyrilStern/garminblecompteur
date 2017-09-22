@@ -5,8 +5,6 @@ package com.example.root.garminblecompteur.scrollviewinformation;
  */
 
 
-import android.graphics.Color;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,31 +16,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.example.root.garminblecompteur.FileContainer;
 import com.example.root.garminblecompteur.FileService;
 import com.example.root.garminblecompteur.R;
-import com.example.root.garminblecompteur.XmlToGeoJson;
 
-import org.osmdroid.api.IMapController;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Polyline;
-import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 public class FragmentThree extends Fragment {
     private RecyclerView mRecyclerView;
@@ -106,9 +86,8 @@ public class FragmentThree extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new CardTraceAdapteur(listNameGpsFile);
+        mAdapter = new CardTraceAdapteur(listNameGpsFile, getActivity());
         mRecyclerView.setAdapter(mAdapter);
-
         return view;
     }
 

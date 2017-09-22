@@ -1,11 +1,9 @@
 package com.example.root.garminblecompteur;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,20 +14,17 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,7 +33,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.root.garminblecompteur.alertDialogRepo.AlertDialogCompose;
@@ -47,47 +41,38 @@ import com.example.root.garminblecompteur.scrollviewinformation.FragmentOne;
 import com.example.root.garminblecompteur.scrollviewinformation.FragmentThree;
 import com.example.root.garminblecompteur.scrollviewinformation.FragmentTwo;
 import com.example.root.garminblecompteur.scrollviewinformation.ScreenSlidePagerAdapter;
+
 import org.osmdroid.config.Configuration;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MainActivity extends AppCompatActivity implements AlertDialogCompose.NoticeDialogListener{
     private static final int REQUEST_ENABLE_BT = 11;
+    /**
+     * The number of pages (wizard steps) to show in this demo.
+     */
+    private static final int NUM_PAGES = 3;
     private final String TAG = LeDeviceListAdapter.class.getName();
     private BluetoothAdapter mBluetoothAdapter;
     private LocationManager locationManager;
     private List<BluetoothDevice> lvDevice;
     private CalculationBikeCommon calculationBikeCommon;
     /**
-     * The number of pages (wizard steps) to show in this demo.
-     */
-    private static final int NUM_PAGES = 3;
-
-    /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
      */
     private ViewPager mPager;
-
     /**
      * The pager adapter, which provides the pages to the view pager widget.
      */
     private ScreenSlidePagerAdapter mPagerAdapter;
-
-
-
     private ActionBarDrawerToggle mDrawerToggle;
     private File file;
     private ListView listViewGpsFile;
@@ -96,6 +81,14 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
     private Polyline lineSave;
     private Fragment mCurrentFragment;
     private ViewPager pager;
+
+    public ScreenSlidePagerAdapter getmPagerAdapter() {
+        return mPagerAdapter;
+    }
+
+    public ViewPager getPager() {
+        return pager;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -179,38 +172,7 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
             listViewGpsFile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String pathFromItem = arraylistFileContainer.get(position).getPath();
-                    XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
-                    mDrawerLayout.closeDrawers();
 
-
-                    /** Load GpsPoint from reading file.**/
-                    try {
-                        ArrayList<GeoPoint> waypoints = xmlToGeoJson.decodeXmlToGeoJson(pathFromItem, getApplicationContext());
-
-                        // depra
-                        Polyline line = new Polyline(getApplicationContext());
-                        line.setTitle("Central Park, NYC");
-                        line.setSubDescription(Polyline.class.getCanonicalName());
-                        line.setWidth(10);
-                        List<GeoPoint> pts = new ArrayList<>();
-                        line.setPoints(waypoints);
-                        line.setGeodesic(true);
-                        //line.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
-                        lineSave = line;
-                        if(mCurrentFragment instanceof FragmentOne){
-                            ((FragmentOne) mCurrentFragment).setTrace(line);
-                        }
-
-                    } catch (SAXException e) {
-                        e.printStackTrace();
-                    } catch (XmlPullParserException e) {
-                        e.printStackTrace();
-                    } catch (ParserConfigurationException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             });
             listViewGpsFile.setAdapter(new ArrayAdapter<String>(this,
