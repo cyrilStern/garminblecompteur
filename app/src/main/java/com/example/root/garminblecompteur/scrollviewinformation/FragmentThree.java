@@ -29,6 +29,7 @@ public class FragmentThree extends Fragment {
     private CardTraceAdapteur mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<String> listNameGpsFile;
+    private ArrayList<FileContainer> arraylistFileContainer;
 
 
 
@@ -44,7 +45,7 @@ public class FragmentThree extends Fragment {
             Toast.makeText(getContext(),"this is emulated device",Toast.LENGTH_SHORT).show();
 
         }else{
-            final ArrayList<FileContainer> arraylistFileContainer = fileService.getListFile("gpstrace");
+            arraylistFileContainer = fileService.getListFile("gpstrace");
             listNameGpsFile = new ArrayList<>();
             for (FileContainer fileGps: arraylistFileContainer) {
                 listNameGpsFile.add(fileGps.getName());
@@ -86,7 +87,7 @@ public class FragmentThree extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new CardTraceAdapteur(listNameGpsFile, getActivity());
+        mAdapter = new CardTraceAdapteur(listNameGpsFile, arraylistFileContainer, getActivity());
         mRecyclerView.setAdapter(mAdapter);
         return view;
     }

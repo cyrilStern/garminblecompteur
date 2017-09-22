@@ -1,33 +1,20 @@
 package com.example.root.garminblecompteur;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.services.commons.geojson.GeoJSON;
-
 import org.osmdroid.util.GeoPoint;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.net.URI;
 import java.util.ArrayList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -47,6 +34,8 @@ public class XmlToGeoJson {
 
     public ArrayList<GeoPoint> decodeXmlToGeoJson(String path, Context ctx) throws ParserConfigurationException, IOException, SAXException, XmlPullParserException {
         BufferedReader reader = null;
+        Log.i("lXmlToGeoJson", path);
+
         StringBuilder sb = new StringBuilder();
         try {
             reader = new BufferedReader(
@@ -75,12 +64,14 @@ public class XmlToGeoJson {
         XmlPullParser xpp = factory.newPullParser();
         xpp.setInput( new StringReader(sb.toString()) );
         int eventType = xpp.getEventType();
+        int count = 0;
         while (eventType != XmlPullParser.END_DOCUMENT) {
             if(eventType == XmlPullParser.START_DOCUMENT) {
             } else if(eventType == XmlPullParser.START_TAG) {
-                if (xpp.getAttributeCount() != 0 && xpp.getName().equals("trkpt") ) {
+                if (xpp.getAttributeCount() != 0 && xpp.getName().equals("trkpt") && (count % 25 == 0)) {
                     lineStringArray.add(new GeoPoint(Float.parseFloat(xpp.getAttributeValue(0)),Float.parseFloat(xpp.getAttributeValue(1))));
                 }
+                count++;
 
             } else if(eventType == XmlPullParser.END_TAG) {
             } else if(eventType == XmlPullParser.TEXT) {

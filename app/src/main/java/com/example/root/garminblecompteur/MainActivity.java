@@ -43,14 +43,20 @@ import com.example.root.garminblecompteur.scrollviewinformation.FragmentTwo;
 import com.example.root.garminblecompteur.scrollviewinformation.ScreenSlidePagerAdapter;
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MainActivity extends AppCompatActivity implements AlertDialogCompose.NoticeDialogListener{
@@ -172,7 +178,37 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
             listViewGpsFile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String pathFromItem = arraylistFileContainer.get(position).getPath();
+                    XmlToGeoJson xmlToGeoJson = XmlToGeoJson.getInstance();
+                    mDrawerLayout.closeDrawers();
 
+
+                    /** Load GpsPoint from reading file.**/
+                    try {
+                        ArrayList<GeoPoint> waypoints = xmlToGeoJson.decodeXmlToGeoJson(pathFromItem, getApplicationContext());
+
+                        // depra
+                        Polyline line = new Polyline(getApplicationContext());
+                        line.setTitle("Central Park, NYC");
+                        line.setSubDescription(Polyline.class.getCanonicalName());
+                        line.setWidth(10);
+                        line.setPoints(waypoints);
+                        line.setGeodesic(true);
+                        //line.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
+                        lineSave = line;
+                        if (mCurrentFragment instanceof FragmentOne) {
+                            ((FragmentOne) mCurrentFragment).setTrace(line);
+                        }
+
+                    } catch (SAXException e) {
+                        e.printStackTrace();
+                    } catch (XmlPullParserException e) {
+                        e.printStackTrace();
+                    } catch (ParserConfigurationException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             listViewGpsFile.setAdapter(new ArrayAdapter<String>(this,

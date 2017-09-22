@@ -5,12 +5,14 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.root.garminblecompteur.FileContainer;
 import com.example.root.garminblecompteur.MainActivity;
 import com.example.root.garminblecompteur.R;
 import com.example.root.garminblecompteur.XmlToGeoJson;
@@ -34,10 +36,12 @@ public class CardTraceAdapteur extends RecyclerView.Adapter<CardTraceAdapteur.Vi
 
     private ArrayList<String> mDataset;
     private MainActivity mactivity;
+    private ArrayList<FileContainer> marraylistFileContainer;
 
-    public CardTraceAdapteur(ArrayList<String> mDataset, FragmentActivity activity) {
+    public CardTraceAdapteur(ArrayList<String> mDataset, ArrayList<FileContainer> arraylistFileContainer, FragmentActivity activity) {
         this.mDataset = mDataset;
         this.mactivity = (MainActivity) activity;
+        this.marraylistFileContainer = arraylistFileContainer;
     }
 
     @Override
@@ -63,10 +67,10 @@ public class CardTraceAdapteur extends RecyclerView.Adapter<CardTraceAdapteur.Vi
 
                 /** Load GpsPoint from reading file.**/
                 try {
-                    ArrayList<GeoPoint> waypoints = xmlToGeoJson.decodeXmlToGeoJson(pathFromItem, mactivity.getApplicationContext());
-
+                    ArrayList<GeoPoint> waypoints = xmlToGeoJson.decodeXmlToGeoJson(marraylistFileContainer.get(position).getPath(), mactivity.getApplicationContext());
+                    Log.i("arrayList", "onClick: " + waypoints.get(0).getLatitude() + pathFromItem);
                     // depra
-                    Polyline line = new Polyline(mactivity.getApplicationContext());
+                    Polyline line = new Polyline();
                     line.setTitle("Central Park, NYC");
                     line.setSubDescription(Polyline.class.getCanonicalName());
                     line.setWidth(10);
@@ -76,8 +80,10 @@ public class CardTraceAdapteur extends RecyclerView.Adapter<CardTraceAdapteur.Vi
                     //line.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
 
                     if (mscreenSlidePagerAdapter.getItem(0) instanceof FragmentOne) {
-                        ((FragmentOne) mscreenSlidePagerAdapter.getItem(0)).setTrace(line);
+                        Log.i("testaddmap", "onClick: " + mactivity.getPager().getCurrentItem());
                         mactivity.getPager().setCurrentItem(0, true);
+                        FragmentOne fm = ((FragmentOne) mscreenSlidePagerAdapter.getItem(0));
+                        fm.setTrace(line);
                     }
 
                 } catch (SAXException e) {

@@ -25,6 +25,9 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
+import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.util.Random;
@@ -84,7 +87,20 @@ public class FragmentOne extends Fragment {
          *
          */
         mapView.setUseDataConnection(false);
+        /**
+         *  actionate twi finger zoom rotation
+         */
+        RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(getContext(), mapView);
+        mRotationGestureOverlay.setEnabled(true);
+        mapView.setMultiTouchControls(true);
+        mapView.getOverlays().add(mRotationGestureOverlay);
 
+        /**
+         * add compass
+         */
+        CompassOverlay mCompassOverlay = new CompassOverlay(getContext(), new InternalCompassOrientationProvider(getContext()), mapView);
+        mCompassOverlay.enableCompass();
+        mapView.getOverlays().add(mCompassOverlay);
         IMapController mapController = mapView.getController();
         mapController.setZoom(5);
         mapView.invalidate();
