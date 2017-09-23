@@ -88,7 +88,7 @@ public class FragmentOne extends Fragment {
          */
         mapView.setUseDataConnection(false);
         /**
-         *  actionate twi finger zoom rotation
+         *  actionate two finger zoom rotation
          */
         RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(getContext(), mapView);
         mRotationGestureOverlay.setEnabled(true);

@@ -7,11 +7,9 @@ import android.content.Intent;
  */
 
 interface IBleBroadcst {
-    void speedCadenceAction();
-
-    void heartRateAction();
-
     void speedCadenceAction(Intent intent);
-
     void heartRateAction(Intent intent);
+
+    void crankRateAction(Intent intent);
+
 }

@@ -11,32 +11,18 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.IntDef;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import com.example.root.garminblecompteur.scrollviewinformation.FragmentTwo;
-
 import java.util.List;
-import java.util.UUID;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BluetoothServiceGat extends Service {
-    private final static String TAG = BluetoothServiceGat.class.getSimpleName();
-
-    private BluetoothManager mBluetoothManager;
-    private BluetoothAdapter mBluetoothAdapter;
-    private String mBluetoothDeviceAddress;
-    private BluetoothGatt mBluetoothGatt;
-    private int mConnectionState = STATE_DISCONNECTED;
-
-    private static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    private static final int STATE_CONNECTED = 2;
-
     public final static  String ACTION_BLE_SERVICE =
             "com.example.root.garminblecompteur";
     public final static String ACTION_GATT_CONNECTED =
@@ -53,31 +39,37 @@ public class BluetoothServiceGat extends Service {
             "com.example.bluetooth.le.HEART_RATE";
     public final static String SPEED_CADENCE =
             "com.example.bluetooth.le.SPEED_CADENCE";
+    public static final String BROADCAST_WHEEL_DATA = "com.example.root.garminblecompteur.BluetoothServiceGat.BROADCAST_WHEEL_DATA";
+    public static final String EXTRA_SPEED = "com.example.root.garminblecompteur.BluetoothServiceGat.EXTRA_SPEED";
+    /**
+     * Distance in meters
+     */
+    public static final String EXTRA_DISTANCE = "com.example.root.garminblecompteur.BluetoothServiceGat.EXTRA_DISTANCE";
+    /**
+     * Total distance in meters
+     */
+    public static final String EXTRA_TOTAL_DISTANCE = "com.example.root.garminblecompteur.BluetoothServiceGat.EXTRA_TOTAL_DISTANCE";
+    public static final String BROADCAST_CRANK_DATA = "com.example.root.garminblecompteur.BluetoothServiceGat.BROADCAST_CRANK_DATA";
+    public static final String EXTRA_GEAR_RATIO = "com.example.root.garminblecompteur.BluetoothServiceGat.EXTRA_GEAR_RATIO";
+    public static final String EXTRA_CADENCE = "com.example.root.garminblecompteur.BluetoothServiceGat.EXTRA_CADENCE";
+    private final static String TAG = BluetoothServiceGat.class.getSimpleName();
+    private static final int STATE_DISCONNECTED = 0;
+    private static final int STATE_CONNECTING = 1;
+    private static final int STATE_CONNECTED = 2;
+    private BluetoothManager mBluetoothManager;
+    private BluetoothAdapter mBluetoothAdapter;
+    private String mBluetoothDeviceAddress;
+    private BluetoothGatt mBluetoothGatt;
+    private int mConnectionState = STATE_DISCONNECTED;
+    private int mFirstWheelRevolutions = -1;
+    private int mLastWheelRevolutions = -1;
+    private int mLastWheelEventTime = -1;
+    private float mWheelCadence = -1;
+    private int mLastCrankRevolutions = -1;
+    private int mLastCrankEventTime = -1;
 //
 //    public final static UUID UUID_HEART_RATE_MEASUREMENT =
 //            UUID.fromString("");
-
-    public BluetoothServiceGat() {
-        Log.i(getPackageName(), "BluetoothServiceGat: service start");
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        BluetoothDevice mbluetoothDevice = (BluetoothDevice) intent.getParcelableExtra("DEVICE");
-        Log.i(getPackageName(), "onStartCommand: " +  mbluetoothDevice.getName());
-        mbluetoothDevice.connectGatt(getApplicationContext(),false,mGattCallback);
-        // Various callback methods defined by the BLE API.
-
-        return START_STICKY;
-
-    }
     private final BluetoothGattCallback mGattCallback =
         new BluetoothGattCallback() {
             @Override
@@ -106,8 +98,7 @@ public class BluetoothServiceGat extends Service {
                 if (String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))).equals("CSC Measurement")) {
                     int offset = 0;
                     offset += 1;
-                    Log.i("onCharacteristicChange", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))));
-
+                    //  Log.i("onCharacteristicChange", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(characteristic.getUuid()))));
                     int wheelRevolutions = 0;
                     int lastWheelEventTime = 0;
                     if (true) {
@@ -127,24 +118,18 @@ public class BluetoothServiceGat extends Service {
                         offset += 2;
 
                     }
+                    // Log.i(TAG + "onCharacteristicChange",wheelRevolutions + "/"+ lastWheelEventTime + "/" + lastCrankEventTime);
                     final int finalWheelRevolutions = wheelRevolutions;
-                    final int finalCrankRevolutions = crankRevolutions;
                     final int finalLastCrankEventTime = lastCrankEventTime;
+                    final int finalCrankRevolutions = crankRevolutions;
                     final int finalLastWheelEventTime = lastWheelEventTime;
 
                     /**
                      * Intent speed/cadence mesuration information
                      */
+                    onWheelMeasurementReceived(finalWheelRevolutions, finalLastWheelEventTime);
+                    onCrankMeasurementReceived(finalCrankRevolutions, finalLastCrankEventTime);
 
-                    final Intent intent = new Intent(ACTION_BLE_SERVICE);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("filter",SPEED_CADENCE);
-                    bundle.putInt("WheelRevolution",finalWheelRevolutions);
-                    bundle.putInt("CrankRevolutions",finalCrankRevolutions);
-                    bundle.putInt("LastCrankEventTime",finalLastCrankEventTime);
-                    bundle.putInt("LastWheelEventTime",finalLastWheelEventTime);
-                    intent.putExtras(bundle);
-                    sendBroadcast(intent);
 
                 }
 
@@ -176,6 +161,7 @@ public class BluetoothServiceGat extends Service {
                 if (String.valueOf(BluetoothResolver.resolveServiceName(service.getUuid().toString())).equals("Cycling Speed and Cadence")) {
                     for (BluetoothGattCharacteristic cara : service.getCharacteristics()) {
                         gatt.setCharacteristicNotification(cara, true);
+                        //get all cara from device
                         Log.i("onServicesDiscovered2", String.valueOf(BluetoothResolver.resolveCharacteristicName(String.valueOf(cara.getUuid()))));
 
 
@@ -217,41 +203,102 @@ public class BluetoothServiceGat extends Service {
             }
         };
 
+    public BluetoothServiceGat() {
+        Log.i(getPackageName(), "BluetoothServiceGat: service start");
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        // TODO: Return the communication channel to the service.
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        BluetoothDevice mbluetoothDevice = intent.getParcelableExtra("DEVICE");
+        Log.i(getPackageName(), "onStartCommand: " + mbluetoothDevice.getName());
+        mbluetoothDevice.connectGatt(getApplicationContext(), false, mGattCallback);
+        // Various callback methods defined by the BLE API.
+
+        return START_STICKY;
+
+    }
+
     private void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
         sendBroadcast(intent);
+    }
+
+    /**
+     * calculation speed distance cranck revolution
+     *
+     * @param wheelRevolutions
+     * @param lastWheelEventTime
+     */
+    public void onWheelMeasurementReceived(final int wheelRevolutions, final int lastWheelEventTime) {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final int circumference = 2096; // [mm]
+
+        if (mFirstWheelRevolutions < 0)
+            mFirstWheelRevolutions = wheelRevolutions;
+
+        if (mLastWheelEventTime == lastWheelEventTime)
+            return;
+
+        if (mLastWheelRevolutions >= 0) {
+            float timeDifference = 0;
+            if (lastWheelEventTime < mLastWheelEventTime)
+                timeDifference = (65535 + lastWheelEventTime - mLastWheelEventTime) / 1024.0f; // [s]
+            else
+                timeDifference = (lastWheelEventTime - mLastWheelEventTime) / 1024.0f; // [s]
+            final float distanceDifference = (wheelRevolutions - mLastWheelRevolutions) * circumference / 1000.0f; // [m]
+            final float totalDistance = (float) wheelRevolutions * (float) circumference / 1000.0f; // [m]
+            final float distance = (float) (wheelRevolutions - mFirstWheelRevolutions) * (float) circumference / 1000.0f; // [m]
+            final float speed = (distanceDifference / 1000) / (timeDifference / 3600);
+            mWheelCadence = (wheelRevolutions - mLastWheelRevolutions) * 60.0f / timeDifference;
+
+            final Intent broadcast = new Intent(BROADCAST_WHEEL_DATA);
+            broadcast.putExtra("filter", BluetoothServiceGat.BROADCAST_WHEEL_DATA);
+            broadcast.putExtra(EXTRA_SPEED, speed);
+            broadcast.putExtra(EXTRA_DISTANCE, distance);
+            broadcast.putExtra(EXTRA_TOTAL_DISTANCE, totalDistance);
+            sendBroadcast(broadcast);
+        }
+        mLastWheelRevolutions = wheelRevolutions;
+        mLastWheelEventTime = lastWheelEventTime;
+    }
+
+    public void onCrankMeasurementReceived(int crankRevolutions, int lastCrankEventTime) {
+        if (mLastCrankEventTime == lastCrankEventTime)
+            return;
+
+        if (mLastCrankRevolutions >= 0) {
+            float timeDifference = 0;
+            if (lastCrankEventTime < mLastCrankEventTime)
+                timeDifference = (65535 + lastCrankEventTime - mLastCrankEventTime) / 1024.0f; // [s]
+            else
+                timeDifference = (lastCrankEventTime - mLastCrankEventTime) / 1024.0f; // [s]
+
+            final float crankCadence = (crankRevolutions - mLastCrankRevolutions) * 60.0f / timeDifference;
+            if (crankCadence > 0) {
+                final float gearRatio = mWheelCadence / crankCadence;
+
+                final Intent broadcast = new Intent(BROADCAST_CRANK_DATA);
+                broadcast.putExtra(EXTRA_GEAR_RATIO, gearRatio);
+                broadcast.putExtra(EXTRA_CADENCE, (int) crankCadence);
+                sendBroadcast(broadcast);
+            }
+        }
+        mLastCrankRevolutions = crankRevolutions;
+        mLastCrankEventTime = lastCrankEventTime;
     }
 
     private void broadcastUpdate(final String action,
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
-        // This is special handling for the Heart Rate Measurement profile. Data
-        // parsing is carried out as per profile specifications.
-//        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
-//            int flag = characteristic.getProperties();
-//            int format = -1;
-//            if ((flag & 0x01) != 0) {
-//                format = BluetoothGattCharacteristic.FORMAT_UINT16;
-//                Log.d(TAG, "Heart rate format UINT16.");
-//            } else {
-//                format = BluetoothGattCharacteristic.FORMAT_UINT8;
-//                Log.d(TAG, "Heart rate format UINT8.");
-//            }
-//            final int heartRate = characteristic.getIntValue(format, 1);
-//            Log.d(TAG, String.format("Received heart rate: %d", heartRate));
-//            intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
-//        } else {
-//            // For all other profiles, writes the data formatted in HEX.
-//            final byte[] data = characteristic.getValue();
-//            if (data != null && data.length > 0) {
-//                final StringBuilder stringBuilder = new StringBuilder(data.length);
-//                for(byte byteChar : data)
-//                    stringBuilder.append(String.format("%02X ", byteChar));
-//                intent.putExtra(EXTRA_DATA, new String(data) + "\n" +
-//                        stringBuilder.toString());
-//            }
-       // }
+
     }
 
 }

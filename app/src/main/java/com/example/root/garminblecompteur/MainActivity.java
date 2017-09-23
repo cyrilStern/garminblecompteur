@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -30,6 +29,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.root.garminblecompteur.alertDialogRepo.AlertDialogCompose;
@@ -187,54 +187,33 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
         if (requestCode == REQUEST_ENABLE_BT) {
             if (resultCode == RESULT_OK) {
 
-                BroadcastReceiver mbluetoothServiceGat = new BleBroadcst() {
-                    private void speedCadenceAction(final Intent intent){
-                        Log.i(getPackageName(), "speedCadenceAction: ");
-                        if(mCurrentFragment instanceof FragmentTwo){
-                            Log.i(getPackageName(), "speedCadenceAction: ");
+                BleBroadcst mbluetoothServiceGat = new BleBroadcst() {
 
-                            ((FragmentTwo) mCurrentFragment).setHeartCounter("heartrate");
-                        }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Bundle b = intent.getExtras();
-                                String speed = String.valueOf(calculationBikeCommon.speedcalculation(b.getInt("WheelRevolution"),b.getInt("CrankRevolutions")));
-                                if(mCurrentFragment instanceof FragmentTwo){
-                                    Log.i(getPackageName(), "speedCadenceAction: " + speed);
-
-                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(speed);
-                                }
-
-                            }
-                        });
-
+                    @Override
+                    public TextView getmContextView() {
+                        return super.getmContextView();
                     }
-                    private void speedHeartAction(final Intent intent){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Bundle b = intent.getExtras();
-                                if(mCurrentFragment instanceof FragmentTwo){
-                                    Log.i(getPackageName(), "heartRate: " + (b.getString("heartRate")));
-                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(b.getString("heartRate"));
-                                }
-                            }
-                        });
 
+                    @Override
+                    public void setmContextView(TextView mContextView) {
+                        super.setmContextView(mContextView);
                     }
+
                     @Override
                     public void onReceive(Context context, Intent intent) {
-                        Log.i(getPackageName(), "onReceive: broadcastreceiveraction: " + intent.getAction());
-                        Bundle b  = intent.getExtras();
+                        super.onReceive(context, intent);
+                        Log.i(getPackageName(), "onReceive: broadcastreceiveraction: " + intent.getIntExtra("WheelRevolution", 0) + intent.getIntExtra("LastWheelEventTime", 0));
+                        Bundle b = intent.getExtras();
 
-                        switch (b.getString("filter")){
-                            case BluetoothServiceGat.HEART_RATE:
-                                speedHeartAction(intent);
-                                break;
-                            case BluetoothServiceGat.SPEED_CADENCE:
+                        switch (b.getString("filter")) {
+                            case BluetoothServiceGat.BROADCAST_WHEEL_DATA:
                                 speedCadenceAction(intent);
                                 break;
+                            case BluetoothServiceGat.BROADCAST_CRANK_DATA:
+                                crankRateAction(intent);
+                                break;
+                            case BluetoothServiceGat.HEART_RATE:
+                                heartRateAction(intent);
                             default:
 
                         }
@@ -245,9 +224,69 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
                             }
                         });
                     }
+
+                    @Override
+                    public void speedCadenceAction(final Intent intent) {
+                        super.speedCadenceAction(intent);
+                        mCurrentFragment = mPagerAdapter.getItem(getPager().getCurrentItem());
+                        if (mCurrentFragment instanceof FragmentTwo) {
+                            // ((FragmentTwo) mCurrentFragment).setHeartCounter("heartrate");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                Bundle b = intent.getExtras();
+                                    String speed = String.valueOf(b.getFloat(BluetoothServiceGat.EXTRA_SPEED));
+                                    String distance = String.valueOf(b.getFloat(BluetoothServiceGat.EXTRA_DISTANCE));
+                                    String totaldistance = String.valueOf(b.getFloat(BluetoothServiceGat.EXTRA_TOTAL_DISTANCE));
+
+
+                                if(mCurrentFragment instanceof FragmentTwo){
+                                    Log.i(getPackageName(), "speedCadenceAction new: " + speed);
+
+                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(speed);
+                                    ((FragmentTwo) mCurrentFragment).setDistanceCounter(distance);
+
+                                }
+
+                            }
+                        });
+                        }
+                    }
+
+                    @Override
+                    public void heartRateAction(final Intent intent) {
+                        super.heartRateAction(intent);
+                        mCurrentFragment = mPagerAdapter.getItem(getPager().getCurrentItem());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Bundle b = intent.getExtras();
+                                if(mCurrentFragment instanceof FragmentTwo){
+                                    Log.i(getPackageName(), "heartRate: " + (b.getString("heartRate")));
+                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(b.getString("heartRate"));
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void crankRateAction(final Intent intent) {
+                        super.crankRateAction(intent);
+                        mCurrentFragment = mPagerAdapter.getItem(getPager().getCurrentItem());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Bundle b = intent.getExtras();
+                                if (mCurrentFragment instanceof FragmentTwo) {
+                                    Log.i(getPackageName(), "heartRate: " + (b.getString("heartRate")));
+                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(b.getString("heartRate"));
+                                }
+                            }
+                        });
+                    }
                 };
 
-                IntentFilter filter= new IntentFilter(BluetoothServiceGat.ACTION_BLE_SERVICE);
+                IntentFilter filter = new IntentFilter(BluetoothServiceGat.BROADCAST_WHEEL_DATA);
                 getApplicationContext().registerReceiver(mbluetoothServiceGat,filter);
 
                 //BluetoothDevice bluetoothDevice = data.getParcelableExtra("DEVICE");

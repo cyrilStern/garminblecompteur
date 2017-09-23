@@ -1,25 +1,20 @@
 package com.example.root.garminblecompteur.bluethoofRepo;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.IBinder;
 import android.widget.TextView;
 
-import com.example.root.garminblecompteur.BluetoothServiceGat;
-
-public class  BleBroadcst extends BroadcastReceiver{
-    public void setmContextView(TextView mContextView) {
-        this.mContextView = mContextView;
-    }
+public class BleBroadcst extends BroadcastReceiver implements IBleBroadcst {
+    private TextView mContextView;
 
     public TextView getmContextView() {
         return mContextView;
     }
 
-    private TextView mContextView;
+    public void setmContextView(TextView mContextView) {
+        this.mContextView = mContextView;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -27,4 +22,18 @@ public class  BleBroadcst extends BroadcastReceiver{
     }
 
 
+    @Override
+    public void speedCadenceAction(Intent intent) {
+
+    }
+
+    @Override
+    public void heartRateAction(Intent intent) {
+
+    }
+
+    @Override
+    public void crankRateAction(Intent intent) {
+
+    }
 }

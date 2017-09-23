@@ -5,7 +5,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +75,6 @@ public class CardTraceAdapteur extends RecyclerView.Adapter<CardTraceAdapteur.Vi
                     //line.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
 
                     if (mscreenSlidePagerAdapter.getItem(0) instanceof FragmentOne) {
-                        Log.i("testaddmap", "onClick: " + mactivity.getPager().getCurrentItem());
                         mactivity.getPager().setCurrentItem(0, true);
                         FragmentOne fm = ((FragmentOne) mscreenSlidePagerAdapter.getItem(0));
                         fm.setTrace(line);

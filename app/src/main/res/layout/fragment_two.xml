@@ -8,73 +8,82 @@
     tools:context="com.example.root.garminblecompteur.MainActivity">
 
 
-    <TextView
-        android:id="@+id/cadencespeed"
-        android:layout_width="157dp"
-        android:layout_height="161dp"
+    <com.example.root.garminblecompteur.fontsClass.ElectronicFontTextView
+        android:id="@+id/distancecounter"
+        android:layout_width="305dp"
+        android:layout_height="69dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/circle_main_heart"
         android:gravity="center"
-        android:textColor="@android:color/black"
+        android:text="1020"
+        android:textColor="@color/cardview_shadow_start_color"
         android:textSize="@android:dimen/app_icon_size"
+        android:textStyle="bold"
+        app:font="ehsmb.ttf"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/distancecounter"
-        app:layout_constraintVertical_bias="0.858"
+        tools:layout_editor_absoluteY="434dp"
         tools:text="1020" />
 
-    <TextView
-        android:id="@+id/distancecounter"
-        android:layout_width="163dp"
-        android:layout_height="163dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/circle_main_heart"
-        android:gravity="center"
-        android:text="56"
-        android:textSize="80dip"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="56"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent" />
-
-    <TextView
-        android:id="@+id/heartView"
-        android:layout_width="291dp"
-        android:layout_height="315dp"
+    <com.example.root.garminblecompteur.fontsClass.ElectronicFontTextView
+        android:id="@+id/speedcounter"
+        android:layout_width="357dp"
+        android:layout_height="278dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="56"
+        android:textColor="@color/colorBar"
+        android:textSize="250dip"
+        android:textStyle="bold"
+        app:font="ehsmb.ttf"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.502"
+        tools:text="56" />
+
+    <com.example.root.garminblecompteur.fontsClass.ElectronicFontTextView
+        android:id="@+id/heartView"
+        android:layout_width="141dp"
+        android:layout_height="136dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="29dp"
+        android:layout_marginTop="16dp"
         android:alpha="1"
-        android:autoText="true"
-        android:background="@drawable/circle_main_heart"
         android:gravity="center"
         android:text="00"
         android:textAllCaps="true"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.DropDownItem"
         android:textColor="@android:color/holo_red_light"
-        android:textSize="140dp"
+        android:textSize="60dp"
         android:textStyle="normal|bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:font="ehsmb.ttf"
+        app:layout_constraintHorizontal_bias="0.931"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.503"
-        tools:layout_editor_absoluteY="45dp"
         tools:text="34" />
+
 
     <ImageView
         android:id="@+id/heartimageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/heart"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
         android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/heart" />
 
     <ImageView
         android:id="@+id/mImageViewCadence"
