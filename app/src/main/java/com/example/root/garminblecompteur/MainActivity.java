@@ -421,6 +421,7 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        /////fuck/////
         switch (item.getItemId()) {
             case R.id.bleActivity:
                 startDicoveredBle();
