@@ -5,4 +5,6 @@ package com.example.root.garminblecompteur;
  */
 
 public class Fuck {
+    public Fuck() {
+    }
 }
