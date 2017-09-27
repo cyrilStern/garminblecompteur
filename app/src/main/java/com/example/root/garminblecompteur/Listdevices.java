@@ -31,7 +31,7 @@ public class Listdevices extends AppCompatActivity{
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
     private final String TAG = LeDeviceListAdapter.class.getName();
-    BluetoothGattCharacteristic characteristic;
+    private BluetoothGattCharacteristic characteristic;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
     private Handler mHandler;
@@ -52,6 +52,7 @@ public class Listdevices extends AppCompatActivity{
 
                             if (mLeDeviceListAdapter.getPosition(device) == -1) {
                                 mLeDeviceListAdapter.add(device);
+                                typBluetoof(device);
                                 mLeDeviceListAdapter.notifyDataSetChanged();
                             }
                         }
@@ -131,6 +132,7 @@ public class Listdevices extends AppCompatActivity{
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private int typBluetoof(BluetoothDevice device) {
+        Log.i(TAG, "typBluetoof: " + device.getName());
         device.connectGatt(getApplicationContext(), false, new BluetoothGattCallback() {
             @Override
             public void onServicesDiscovered(BluetoothGatt gatt, int status) {
