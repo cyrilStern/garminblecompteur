@@ -2,11 +2,11 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constrainfragmenttwo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorAccent"
     tools:context="com.example.root.garminblecompteur.MainActivity">
-
 
     <com.example.root.garminblecompteur.fontsClass.ElectronicFontTextView
         android:id="@+id/distancecounter"
@@ -73,7 +73,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="34" />
-
 
     <ImageView
         android:id="@+id/heartimageView"

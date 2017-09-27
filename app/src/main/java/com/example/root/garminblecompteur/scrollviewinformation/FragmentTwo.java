@@ -9,6 +9,7 @@ import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,9 @@ import android.widget.TextView;
 
 import com.example.root.garminblecompteur.R;
 
-public class FragmentTwo extends Fragment {
+import static android.content.ContentValues.TAG;
+
+public class FragmentTwo extends Fragment implements View.OnClickListener {
     private String title;
     private int image;
     private ImageView mImageView;
@@ -28,6 +31,8 @@ public class FragmentTwo extends Fragment {
     private TextView mSpeedCadenceCounterView;
     private TextView DistanceCounterView;
     private ImageView mImageViewCadence;
+
+    private int displayConteur;
 
 
     public static FragmentTwo newInstance(String title) {
@@ -49,9 +54,11 @@ public class FragmentTwo extends Fragment {
         View view = inflater.inflate(R.layout.fragment_two, container, false);
         mHeartCounterView = (TextView) view.findViewById(R.id.heartView);
         mSpeedCadenceCounterView = (TextView) view.findViewById(R.id.speedcounter);
+        mSpeedCadenceCounterView.setOnClickListener(this);
         DistanceCounterView = (TextView) view.findViewById(R.id.distancecounter);
         mImageView = (ImageView) view.findViewById(R.id.heartimageView);
         mImageViewCadence = (ImageView) view.findViewById(R.id.mImageViewCadence);
+        displayConteur = 0;
         return view;
     }
 
@@ -83,8 +90,25 @@ public class FragmentTwo extends Fragment {
     public void setHeartCounter(String heartNbr){
         mHeartCounterView.setText(heartNbr);
     }
-    public void setSpeedCounter(String speedNbr){
-        mSpeedCadenceCounterView.setText(speedNbr);
+
+    public void setSpeedCounter(String speedNbr, String distance, String totalDistance) {
+        Log.i(TAG, "setSpeedCounter: " + displayConteur + "distane :" + distance + "vitesse : " + speedNbr + "total: " + totalDistance);
+        switch (displayConteur) {
+            case 0:
+                mSpeedCadenceCounterView.setText(speedNbr);
+                Log.i(TAG, "setSpeedCounter: speed");
+                break;
+            case 1:
+                mSpeedCadenceCounterView.setText(distance);
+                Log.i(TAG, "setSpeedCounter: distance");
+
+                break;
+            case 2:
+                mSpeedCadenceCounterView.setText(totalDistance);
+                Log.i(TAG, "setSpeedCounter: totaldistance");
+
+                break;
+        }
     }
     public void setDistanceCounter(String distanceNbr){
         DistanceCounterView.setText(distanceNbr);
@@ -93,4 +117,13 @@ public class FragmentTwo extends Fragment {
 
     }
 
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == mSpeedCadenceCounterView.getId()) {
+            displayConteur++;
+            if (displayConteur > 2) displayConteur = 0;
+
+        }
+    }
 }

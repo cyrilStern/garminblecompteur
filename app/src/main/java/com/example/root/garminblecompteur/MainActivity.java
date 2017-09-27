@@ -241,10 +241,8 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
 
 
                                 if(mCurrentFragment instanceof FragmentTwo){
-                                    Log.i(getPackageName(), "speedCadenceAction new: " + speed);
-
-                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(speed);
-                                    ((FragmentTwo) mCurrentFragment).setDistanceCounter(distance);
+                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(speed, distance, totaldistance);
+                                    //((FragmentTwo) mCurrentFragment).setDistanceCounter(distance);
 
                                 }
 
@@ -263,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
                                 Bundle b = intent.getExtras();
                                 if(mCurrentFragment instanceof FragmentTwo){
                                     Log.i(getPackageName(), "heartRate: " + (b.getString("heartRate")));
-                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(b.getString("heartRate"));
+                                    ((FragmentTwo) mCurrentFragment).setHeartCounter(b.getString("heartRate"));
                                 }
                             }
                         });
@@ -279,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements AlertDialogCompos
                                 Bundle b = intent.getExtras();
                                 if (mCurrentFragment instanceof FragmentTwo) {
                                     Log.i(getPackageName(), "heartRate: " + (b.getString("heartRate")));
-                                    ((FragmentTwo) mCurrentFragment).setSpeedCounter(b.getString("heartRate"));
+                                    ((FragmentTwo) mCurrentFragment).setHeartCounter(b.getString("heartRate"));
                                 }
                             }
                         });

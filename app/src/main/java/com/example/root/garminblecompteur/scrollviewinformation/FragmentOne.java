@@ -128,7 +128,7 @@ public class FragmentOne extends Fragment {
     }
 
     public void setPositionMarker(Location location){
-        if (mapView != null) {
+        if (mapView != null && positionUser != null) {
             positionUser.setPosition(new GeoPoint(location.getLatitude(), location.getLongitude()));
             positionUser.setPanToView(true);
             mapView.getOverlays().add(positionUser);
